@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Integer> {
-    Optional<UserEntity> findById(int id);
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    Optional<UserEntity> findById(Long id);
     List<UserEntity> findAllByOrderByIdDesc();
     Optional<UserEntity> findByEmail(String email);
 }

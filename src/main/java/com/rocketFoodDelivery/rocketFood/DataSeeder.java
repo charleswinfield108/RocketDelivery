@@ -34,11 +34,11 @@ public class DataSeeder {
                 addressRepository.deleteAll();
 
                 // Seed new data
-                UserEntity user = UserEntity.builder()
-                                .name("John Doe")
-                                .email("john.doe@codeboxx.com")
-                                .password("password123")
-                                .build();
+                UserEntity user = new UserEntity();
+                user.setEmail("john.doe@codeboxx.com");
+                user.setFirstName("John");
+                user.setLastName("Doe");
+                user.setPhoneNumber("1234567890");
                 userRepository.save(user);
 
                 Address address = Address.builder()
@@ -52,7 +52,7 @@ public class DataSeeder {
                                 .userEntity(user)
                                 .address(address)
                                 .email("john.eater@rocketfooddelivery.com")
-                                .phone("1 23 4224424")
+                                .phone("1234567890")
                                 .active(true)
                                 .build();
                 customerRepository.save(customer);
