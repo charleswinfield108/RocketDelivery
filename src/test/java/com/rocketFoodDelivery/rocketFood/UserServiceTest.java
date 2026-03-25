@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
  * Tests service logic with mocked repository.
  */
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class UserServiceTest {
 
     @Mock
@@ -46,6 +47,7 @@ class UserServiceTest {
 
     @Test
     void testCreateUser_Success() {
+        assertNotNull(testUser);
         when(userRepository.save(any(UserEntity.class))).thenReturn(testUser);
 
         UserEntity result = userService.createUser(testUser);
@@ -57,6 +59,7 @@ class UserServiceTest {
 
     @Test
     void testCreateUser_InvalidData_NullEmail() {
+        assertNotNull(testUser);
         testUser.setEmail(null);
         
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
@@ -65,6 +68,7 @@ class UserServiceTest {
 
     @Test
     void testCreateUser_InvalidData_NullFirstName() {
+        assertNotNull(testUser);
         testUser.setFirstName(null);
         
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
@@ -73,6 +77,7 @@ class UserServiceTest {
 
     @Test
     void testCreateUser_InvalidData_FirstNameTooShort() {
+        assertNotNull(testUser);
         testUser.setFirstName("A");
         
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
@@ -81,6 +86,7 @@ class UserServiceTest {
 
     @Test
     void testCreateUser_InvalidData_PhoneNumberTooShort() {
+        assertNotNull(testUser);
         testUser.setPhoneNumber("123");
         
         assertThrows(IllegalArgumentException.class, () -> userService.createUser(testUser));
@@ -91,10 +97,10 @@ class UserServiceTest {
     void testGetUserById_Found() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
-        Optional<UserEntity> result = userService.getUserById(1L);
+        UserEntity result = userService.getUserById(1L);
 
-        assertTrue(result.isPresent());
-        assertEquals("test@example.com", result.get().getEmail());
+        assertNotNull(result);
+        assertEquals("test@example.com", result.getEmail());
         verify(userRepository, times(1)).findById(1L);
     }
 
@@ -102,10 +108,13 @@ class UserServiceTest {
     void testGetUserById_NotFound() {
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        Optional<UserEntity> result = userService.getUserById(999L);
-
-        assertFalse(result.isPresent());
+        assertThrows(RuntimeException.class, () -> userService.getUserById(999L));
         verify(userRepository, times(1)).findById(999L);
+    }
+
+    @Test
+    void testGetUserById_NullId() {
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserById(null));
     }
 
     @Test
@@ -126,6 +135,16 @@ class UserServiceTest {
         Optional<UserEntity> result = userService.getUserByEmail("nonexistent@example.com");
 
         assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testGetUserByEmail_NullEmail() {
+        assertThrows(IllegalArgumentException.class, () -> userService.getUserByEmail(null));
+    }
+
+    @Test
+    void testCreateUser_NullUser() {
+        assertThrows(IllegalArgumentException.class, () -> userService.createUser(null));
     }
 
     @Test
@@ -157,30 +176,42 @@ class UserServiceTest {
 
     @Test
     void testUpdateUser_Success() {
+        assertNotNull(testUser);
         UserEntity updatedUser = new UserEntity();
         updatedUser.setEmail("updated@example.com");
         updatedUser.setFirstName("Jane");
         updatedUser.setLastName("Smith");
         updatedUser.setPhoneNumber("9876543210");
+        assertNotNull(updatedUser);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(userRepository.save(any(UserEntity.class))).thenReturn(updatedUser);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(testUser);
 
-        Optional<UserEntity> result = userService.updateUser(1L, updatedUser);
+        UserEntity result = userService.updateUser(1L, updatedUser);
 
-        assertTrue(result.isPresent());
+        assertNotNull(result);
         verify(userRepository, times(1)).findById(1L);
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
     @Test
     void testUpdateUser_NotFound() {
+        assertNotNull(testUser);
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-        Optional<UserEntity> result = userService.updateUser(999L, testUser);
-
-        assertFalse(result.isPresent());
+        assertThrows(RuntimeException.class, () -> userService.updateUser(999L, testUser));
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void testUpdateUser_NullId() {
+        assertNotNull(testUser);
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(null, testUser));
+    }
+
+    @Test
+    void testUpdateUser_NullUser() {
+        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(1L, null));
     }
 
     @Test
@@ -188,9 +219,8 @@ class UserServiceTest {
         when(userRepository.existsById(1L)).thenReturn(true);
         doNothing().when(userRepository).deleteById(1L);
 
-        boolean result = userService.deleteUser(1L);
+        userService.deleteUser(1L);
 
-        assertTrue(result);
         verify(userRepository, times(1)).deleteById(1L);
     }
 
@@ -198,10 +228,13 @@ class UserServiceTest {
     void testDeleteUser_NotFound() {
         when(userRepository.existsById(999L)).thenReturn(false);
 
-        boolean result = userService.deleteUser(999L);
-
-        assertFalse(result);
+        assertThrows(RuntimeException.class, () -> userService.deleteUser(999L));
         verify(userRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testDeleteUser_NullId() {
+        assertThrows(IllegalArgumentException.class, () -> userService.deleteUser(null));
     }
 
     @Test

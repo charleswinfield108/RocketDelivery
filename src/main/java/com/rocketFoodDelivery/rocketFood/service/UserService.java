@@ -26,8 +26,12 @@ public class UserService {
      * Create a new user.
      * @param user the UserEntity to create
      * @return the created UserEntity with generated ID
+     * @throws IllegalArgumentException if user is null or invalid
      */
     public UserEntity createUser(UserEntity user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         validateUserData(user);
         return userRepository.save(user);
     }
@@ -35,18 +39,28 @@ public class UserService {
     /**
      * Retrieve a user by ID.
      * @param id the user ID
-     * @return Optional containing the user if found
+     * @return the user if found
+     * @throws IllegalArgumentException if id is null
+     * @throws RuntimeException if user not found
      */
-    public Optional<UserEntity> getUserById(Long id) {
-        return userRepository.findById(id);
+    public UserEntity getUserById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     /**
      * Retrieve a user by email.
      * @param email the user's email
      * @return Optional containing the user if found
+     * @throws IllegalArgumentException if email is null
      */
     public Optional<UserEntity> getUserByEmail(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
         return userRepository.findByEmail(email);
     }
 
@@ -62,30 +76,43 @@ public class UserService {
      * Update an existing user.
      * @param id the user ID to update
      * @param updatedUser the updated user data
-     * @return Optional containing the updated user if found
+     * @return the updated user
+     * @throws IllegalArgumentException if id or updatedUser is null
+     * @throws RuntimeException if user not found
      */
-    public Optional<UserEntity> updateUser(Long id, UserEntity updatedUser) {
-        return userRepository.findById(id).map(existingUser -> {
-            validateUserData(updatedUser);
-            existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setFirstName(updatedUser.getFirstName());
-            existingUser.setLastName(updatedUser.getLastName());
-            existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
-            return userRepository.save(existingUser);
-        });
+    public UserEntity updateUser(Long id, UserEntity updatedUser) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
+        }
+        if (updatedUser == null) {
+            throw new IllegalArgumentException("Updated user cannot be null");
+        }
+        
+        UserEntity existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        validateUserData(updatedUser);
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
+        return userRepository.save(existingUser);
     }
 
     /**
      * Delete a user by ID.
      * @param id the user ID to delete
-     * @return true if user was deleted, false if not found
+     * @throws IllegalArgumentException if id is null
+     * @throws RuntimeException if user not found
      */
-    public boolean deleteUser(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.deleteById(id);
-            return true;
+    public void deleteUser(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id cannot be null");
         }
-        return false;
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(id);
     }
 
     /**
@@ -125,8 +152,12 @@ public class UserService {
      * Check if a user exists by email.
      * @param email the email to check
      * @return true if user exists with this email
+     * @throws IllegalArgumentException if email is null
      */
     public boolean existsByEmail(String email) {
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
         return userRepository.findByEmail(email).isPresent();
     }
 
