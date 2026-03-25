@@ -52,13 +52,11 @@ public class DataSeeder {
                 address.setIsDefault(true);
                 addressRepository.save(address);
 
-                Customer customer = Customer.builder()
-                                .userEntity(user)
-                                .address(address)
-                                .email("john.eater@rocketfooddelivery.com")
-                                .phone("1234567890")
-                                .active(true)
-                                .build();
+                CustomerEntity customer = new CustomerEntity();
+                customer.setUser(user);
+                customer.setPhoneNumber("1234567890");
+                customer.setLoyaltyPoints(0);
+                customer.setIsActive(true);
                 customerRepository.save(customer);
         }
 
