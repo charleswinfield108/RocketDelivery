@@ -505,3 +505,468 @@ Restaurants (1) ──1:N─→ Orders (Many)
 3. **Foreign keys** enforce referential integrity, preventing orphaned records and maintaining data quality
 4. **Cascading deletes** ensure consistency (e.g., deleting a customer removes their orders automatically)
 5. The ERD structure directly maps to the Spring Boot package structure (entities, repositories, services)
+
+---
+
+# Test-Driven Development (TDD) in Java: A Guide for RocketDelivery
+
+## What is Test-Driven Development (TDD)?
+
+**Test-Driven Development (TDD)** is a software development methodology where **tests are written BEFORE the actual implementation code**. Instead of writing code and then testing it afterward, TDD inverts this process:
+
+1. **Write a test** that describes what the code should do
+2. **Run the test** (it will fail because the code doesn't exist yet)
+3. **Write minimal code** to make the test pass
+4. **Refactor** the code to improve quality while keeping tests green
+
+This approach ensures that every line of code has a corresponding test, leading to more reliable, maintainable software.
+
+### **TDD vs. Traditional Development:**
+
+| Aspect | Traditional | TDD |
+|--------|-----------|-----|
+| **Order** | Code → Test | Test → Code |
+| **Test Coverage** | Often incomplete, added afterward | 100% by design |
+| **Code Quality** | Varies; depends on discipline | Higher; enforced by tests |
+| **Debugging** | Later in development cycle | Caught immediately |
+| **Refactoring** | Risky; might break untested code | Safe; tests verify correctness |
+| **Documentation** | Separate from code | Tests serve as living documentation |
+
+---
+
+## The TDD Cycle: Red-Green-Refactor
+
+TDD follows a three-phase cycle repeated for each feature:
+
+### **Phase 1: RED 🔴**
+Write a test that **fails** because the feature doesn't exist yet.
+
+```java
+// Test for RocketDelivery: Calculate order total with tax
+@Test
+public void calculateOrderTotalWithTax() {
+    Order order = new Order(subtotal: 100.0, taxRate: 0.08);
+    double total = order.calculateTotal();
+    
+    assertEquals(108.0, total); // FAILS - method doesn't exist yet
+}
+```
+
+The test is intentionally failing. This confirms:
+- The test is actually testing something
+- The feature is truly missing
+- You're not accidentally passing without implementation
+
+### **Phase 2: GREEN 🟢**
+Write the **minimal code** to make the test pass.
+
+```java
+// Minimal implementation - just enough to pass the test
+public class Order {
+    private double subtotal;
+    private double taxRate;
+    
+    public double calculateTotal() {
+        return subtotal * (1 + taxRate); // Makes test pass
+    }
+}
+```
+
+**Characteristics of Green Phase:**
+- Code is simple and focused
+- No over-engineering or premature optimization
+- All tests pass
+- The implementation directly addresses the test requirement
+
+### **Phase 3: REFACTOR 🔄**
+Improve code quality **without changing behavior**. Tests stay green.
+
+```java
+// Refactored: More maintainable, still passes all tests
+public class Order {
+    private BigDecimal subtotal;
+    private double taxRate;
+    
+    public BigDecimal calculateTotal() {
+        BigDecimal taxMultiplier = BigDecimal.valueOf(1 + taxRate);
+        return subtotal.multiply(taxMultiplier);
+    }
+}
+```
+
+**Refactoring Goals:**
+- Use appropriate data types (BigDecimal for money, not double)
+- Improve readability and naming
+- Reduce duplication
+- Optimize performance
+- **Tests continuously verify correctness**
+
+---
+
+## Why TDD Matters for RocketDelivery
+
+A food delivery platform like RocketDelivery has **zero tolerance for bugs** because they directly impact:
+- **Customer Trust:** Incorrect order totals or delivery tracking loses trust
+- **Revenue:** Payment failures and order miscalculations cost money
+- **Reputation:** Delivery errors and wrong food damage brand reputation
+- **Data Integrity:** Incorrect database operations can corrupt customer data
+
+### **TDD Benefits for RocketDelivery:**
+
+#### **1. Prevents Critical Business Logic Bugs**
+```java
+// Example: Order validation
+@Test
+public void shouldRejectOrderWithInactiveRestaurant() {
+    Restaurant restaurant = new Restaurant(isActive: false);
+    Order order = new Order(restaurant, items);
+    
+    assertThrows(IllegalStateException.class, () -> orderService.createOrder(order));
+    // TDD ensures this rule is tested and never breaks
+}
+```
+
+#### **2. Enables Safe Refactoring**
+Food delivery is complex with interconnected services. TDD prevents regression when improving code:
+
+```java
+// Before refactoring: Complex hairy code that works
+public void updateOrderStatus() { /* 50 lines of spaghetti */ }
+
+// After refactoring: Clean, maintainable code
+// Tests confirm: Same behavior, better structure
+@Test
+public void orderStatusTransitionsCorrectly() { /* verified */ }
+```
+
+#### **3. Catches Integration Issues Early**
+```java
+// Test database interactions before production
+@Test
+public void shouldPersistOrderAndNotifyRestaurant() {
+    Order order = orderService.createOrder(request);
+    
+    assertTrue(orderRepository.findById(order.getId()).isPresent());
+    verify(emailService).notifyRestaurant(order.getRestaurantId());
+}
+```
+
+#### **4. Reduces Customer-Reported Bugs**
+- Fewer bugs reach production
+- Faster issue resolution when they occur
+- Higher-quality order history and delivery tracking
+
+---
+
+## TDD Best Practices for Java
+
+### **1. Test Naming Convention: Describe the Behavior**
+
+```java
+// ❌ Poor - Doesn't describe intent
+@Test
+public void test1() { }
+
+// ✅ Good - Clear, describes expected behavior
+@Test
+public void shouldCalculateOrderTotalWithDiscount() { }
+
+// ✅ Also good - Arrange-Act-Assert pattern
+@Test
+public void orderWithDiscount_appliesDiscountCorrectly() { }
+```
+
+### **2. Follow Arrange-Act-Assert (AAA) Pattern**
+
+Every test should have three clear sections:
+
+```java
+@Test
+public void shouldApply10PercentDiscountForLoyalCustomers() {
+    // ARRANGE: Set up test data
+    Customer loyalCustomer = new Customer(isLoyalty: true);
+    Order order = new Order(subtotal: 100.0, customer: loyalCustomer);
+    
+    // ACT: Perform the action being tested
+    double discount = discountService.calculateDiscount(order);
+    
+    // ASSERT: Verify the result
+    assertEquals(10.0, discount);
+}
+```
+
+### **3. Write One Assertion Per Test (When Possible)**
+
+```java
+// ❌ Multiple assertions - harder to isolate failures
+@Test
+public void testOrderCreation() {
+    Order order = new Order(customer, items);
+    assertEquals("PENDING", order.getStatus());
+    assertEquals(99.99, order.getTotal());
+    assertNotNull(order.getCreatedAt());
+    assertTrue(order.getItems().size() > 0);
+}
+
+// ✅ Separate, focused tests
+@Test
+public void newOrderHasPendingStatus() {
+    Order order = new Order(customer, items);
+    assertEquals("PENDING", order.getStatus());
+}
+
+@Test
+public void newOrderHasCorrectTotal() {
+    Order order = new Order(customer, items);
+    assertEquals(99.99, order.getTotal());
+}
+```
+
+### **4. Test Both Success and Failure Cases**
+
+```java
+// Success case
+@Test
+public void shouldCreateOrderSuccessfully() {
+    Order order = orderService.createOrder(validRequest);
+    assertNotNull(order.getId());
+}
+
+// Failure cases
+@Test
+public void shouldRejectOrderWithoutItems() {
+    assertThrows(IllegalArgumentException.class, 
+        () -> orderService.createOrder(emptyRequest));
+}
+
+@Test
+public void shouldRejectOrderWithInvalidAddress() {
+    assertThrows(InvalidAddressException.class,
+        () -> orderService.createOrder(invalidAddressRequest));
+}
+```
+
+### **5. Use Meaningful Test Data**
+
+```java
+// ❌ Magic numbers - what do they represent?
+@Test
+public void calculateDeliveryFee() {
+    double distance = 5.5;
+    double fee = deliveryService.calculateFee(distance);
+    assertEquals(12.99, fee);
+}
+
+// ✅ Named variables - clear intent
+@Test
+public void calculateDeliveryFeeFor5MileDelivery() {
+    double distance = 5.5; // miles
+    double EXPECTED_FEE = 12.99;
+    
+    double calculatedFee = deliveryService.calculateFee(distance);
+    assertEquals(EXPECTED_FEE, calculatedFee);
+}
+```
+
+### **6. Keep Tests Fast and Isolated**
+
+```java
+// ✅ Use mocks to avoid slow database calls
+@Test
+public void shouldApplyRestaurantDiscountRules() {
+    // Mock the database
+    RestaurantRepository mockRepo = mock(RestaurantRepository.class);
+    when(mockRepo.findById(1L)).thenReturn(
+        Optional.of(new Restaurant(discountRule: 0.15))
+    );
+    
+    DiscountService service = new DiscountService(mockRepo);
+    double discount = service.calculateDiscount(1L);
+    
+    assertEquals(0.15, discount);
+    // Fast - no database access
+}
+```
+
+---
+
+## TDD Workflow Example: Order Status Validation
+
+Let's walk through a complete TDD cycle for a RocketDelivery feature:
+
+### **Feature:** Validate that orders can only transition to valid statuses
+
+**Step 1: RED 🔴 - Write Failing Test**
+```java
+@Test
+public void shouldRejectInvalidOrderStatusTransition() {
+    Order order = new Order(status: "PENDING");
+    
+    // PENDING → CANCELLED is valid
+    // PENDING → COMPLETED would be invalid (must be CONFIRMED first)
+    
+    assertThrows(IllegalStateException.class, 
+        () -> order.setStatus("COMPLETED"));
+}
+```
+
+**Step 2: GREEN 🟢 - Write Minimal Code**
+```java
+public class Order {
+    private String status;
+    
+    public void setStatus(String newStatus) {
+        if ("PENDING".equals(status) && "COMPLETED".equals(newStatus)) {
+            throw new IllegalStateException("Invalid transition");
+        }
+        this.status = newStatus;
+    }
+}
+```
+
+**Step 3: REFACTOR 🔄 - Improve Quality**
+```java
+public enum OrderStatus {
+    PENDING,
+    CONFIRMED,
+    DELIVERING,
+    COMPLETED,
+    CANCELLED;
+    
+    // Define valid transitions
+    private static final Map<OrderStatus, Set<OrderStatus>> VALID_TRANSITIONS = Map.of(
+        PENDING, Set.of(CONFIRMED, CANCELLED),
+        CONFIRMED, Set.of(DELIVERING, CANCELLED),
+        DELIVERING, Set.of(COMPLETED),
+        COMPLETED, Set.of(),
+        CANCELLED, Set.of()
+    );
+    
+    public boolean canTransitionTo(OrderStatus next) {
+        return VALID_TRANSITIONS.get(this).contains(next);
+    }
+}
+
+public class Order {
+    private OrderStatus status;
+    
+    public void setStatus(OrderStatus newStatus) {
+        if (!status.canTransitionTo(newStatus)) {
+            throw new IllegalStateException(
+                "Cannot transition from " + status + " to " + newStatus);
+        }
+        this.status = newStatus;
+    }
+}
+```
+
+**Additional Test Cases (TDD ensures all are covered):**
+```java
+@Test
+public void shouldAllow_PENDING_to_CONFIRMED() {
+    Order order = new Order(status: PENDING);
+    order.setStatus(CONFIRMED); // ✅ No exception
+}
+
+@Test
+public void shouldAllow_PENDING_to_CANCELLED() {
+    Order order = new Order(status: PENDING);
+    order.setStatus(CANCELLED); // ✅ No exception
+}
+
+@Test
+public void shouldReject_PENDING_to_COMPLETED() {
+    Order order = new Order(status: PENDING);
+    assertThrows(IllegalStateException.class, () -> order.setStatus(COMPLETED));
+}
+```
+
+---
+
+## TDD in the Spring Boot Context (RocketDelivery's Framework)
+
+RocketDelivery uses Spring Boot with JPA, so TDD applies to:
+
+### **Service Layer Testing**
+```java
+@ExtendWith(MockitoExtension.class)
+public class OrderServiceTest {
+    
+    @Mock
+    private OrderRepository orderRepository;
+    
+    @Mock
+    private RestaurantService restaurantService;
+    
+    @InjectMocks
+    private OrderService orderService;
+    
+    @Test
+    public void shouldCreateOrderIfRestaurantExists() {
+        // Arrange
+        Restaurant restaurant = new Restaurant(id: 1L, name: "Mario's Pizza");
+        when(restaurantService.getById(1L)).thenReturn(restaurant);
+        
+        // Act
+        Order order = orderService.createOrder(customerId: 5L, items: [...]);
+        
+        // Assert
+        verify(orderRepository).save(order);
+        assertEquals(1L, order.getRestaurantId());
+    }
+}
+```
+
+### **Controller Testing**
+```java
+@WebMvcTest(OrderController.class)
+public class OrderControllerTest {
+    
+    @MockBean
+    private OrderService orderService;
+    
+    @Autowired
+    private MockMvc mockMvc;
+    
+    @Test
+    public void shouldReturn200WhenCreatingOrder() throws Exception {
+        // Arrange
+        Order order = new Order(id: 1L, status: "PENDING");
+        when(orderService.createOrder(any())).thenReturn(order);
+        
+        // Act & Assert
+        mockMvc.perform(post("/api/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"customerId\": 5}"))
+            .andExpect(status().isCreated());
+    }
+}
+```
+
+---
+
+## TDD Benefits Summary
+
+| Benefit | How TDD Delivers It |
+|---------|------------------|
+| **Bug Prevention** | Every code path has a test; bugs caught before deployment |
+| **Documentation** | Tests show exactly how to use each class/method |
+| **Design Improvement** | Hard-to-test code forces better architecture |
+| **Refactoring Safety** | Tests confirm changes don't break functionality |
+| **Faster Development** | Fewer bugs to fix later saves overall time |
+| **Team Confidence** | Code reviews backed by comprehensive tests |
+| **Regression Prevention** | Future changes verified against existing tests |
+
+---
+
+## Getting Started with TDD in RocketDelivery
+
+1. **Start small:** Apply TDD to new features, not legacy code
+2. **Use JUnit 5 and Mockito:** Already in RocketDelivery's pom.xml
+3. **Write tests first, code second:** Resist the temptation to code first
+4. **Aim for high coverage:** RocketDelivery goals: 80%+ code coverage
+5. **Review tests in code reviews:** Test quality = System quality
+6. **Run tests frequently:** Continuous feedback loop prevents regressions
+
+TDD transforms RocketDelivery from a system that "seems to work" into one where every order calculation, delivery status, and customer interaction is **mathematically proven correct** through comprehensive testing.
+
