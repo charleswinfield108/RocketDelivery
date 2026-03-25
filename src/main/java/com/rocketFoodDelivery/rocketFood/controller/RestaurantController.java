@@ -6,6 +6,9 @@ import com.rocketFoodDelivery.rocketFood.service.RestaurantService;
 import com.rocketFoodDelivery.rocketFood.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,19 +49,30 @@ public class RestaurantController {
     // ==================== List Endpoint ====================
 
     /**
-     * Display list of all restaurants.
+     * Display paginated list of all restaurants.
      * GET /backoffice/restaurants
      *
+     * @param page page number (0-indexed, default 0)
+     * @param size number of restaurants per page (default 10)
      * @param model Spring MVC model for view rendering
      * @return template name: backoffice/restaurants/index
      */
     @GetMapping
-    public String listRestaurants(Model model) {
-        log.info("Fetching all restaurants for back office list view");
+    public String listRestaurants(
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        Model model) {
+        log.info("Fetching restaurants page {} with size {} for back office list view", page, size);
 
-        List<RestaurantEntity> restaurants = restaurantService.getAllRestaurants();
-        model.addAttribute("restaurants", restaurants);
-        model.addAttribute("restaurantCount", restaurants.size());
+        Pageable pageable = PageRequest.of(page, size);
+        Page<RestaurantEntity> restaurantPage = restaurantService.getAllRestaurantsPaginated(pageable);
+        
+        model.addAttribute("restaurants", restaurantPage.getContent());
+        model.addAttribute("restaurantPage", restaurantPage);
+        model.addAttribute("restaurantCount", restaurantPage.getTotalElements());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", restaurantPage.getTotalPages());
+        model.addAttribute("pageSize", size);
 
         return "backoffice/restaurants/index";
     }
@@ -185,8 +199,17 @@ public class RestaurantController {
         }
 
         try {
+            // Fetch existing restaurant to preserve owner during update
+            Optional<RestaurantEntity> existingOpt = restaurantService.getRestaurantById(id);
+            if (existingOpt.isEmpty()) {
+                log.warn("Restaurant not found for update, ID: {}", id);
+                redirectAttributes.addFlashAttribute("errorMessage",
+                    "Restaurant not found");
+                return "redirect:/backoffice/restaurants";
+            }
+
             // TODO: In future, verify owner matches current logged-in user
-            Long ownerId = getDefaultOwnerId();
+            Long ownerId = existingOpt.get().getOwner().getId();
 
             RestaurantEntity updatedRestaurant = restaurantService.updateRestaurant(id, ownerId, restaurant);
             log.info("Restaurant updated successfully: {} (ID: {})", updatedRestaurant.getName(), updatedRestaurant.getId());
@@ -207,14 +230,14 @@ public class RestaurantController {
     // ==================== Delete Endpoint ====================
 
     /**
-     * Delete a restaurant (confirmation and processing).
-     * GET /backoffice/restaurants/{id}/delete
+     * Delete a restaurant (POST for safety).
+     * POST /backoffice/restaurants/{id}/delete
      *
      * @param id the restaurant ID
      * @param redirectAttributes for flash messages
      * @return redirect to list after deletion
      */
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String deleteRestaurant(
         @PathVariable Long id,
         RedirectAttributes redirectAttributes) {
@@ -234,7 +257,7 @@ public class RestaurantController {
             String restaurantName = restaurantOpt.get().getName();
 
             // TODO: In future, verify owner matches current logged-in user
-            Long ownerId = getDefaultOwnerId();
+            Long ownerId = restaurantOpt.get().getOwner().getId();
 
             restaurantService.deleteRestaurant(id, ownerId);
             log.info("Restaurant deleted successfully: {} (ID: {})", restaurantName, id);

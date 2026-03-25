@@ -3,6 +3,8 @@ package com.rocketFoodDelivery.rocketFood.service;
 import com.rocketFoodDelivery.rocketFood.models.RestaurantEntity;
 import com.rocketFoodDelivery.rocketFood.models.UserEntity;
 import com.rocketFoodDelivery.rocketFood.repository.RestaurantRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -119,6 +121,19 @@ public class RestaurantService {
      */
     public List<RestaurantEntity> getAllRestaurants() {
         return restaurantRepository.findAll();
+    }
+
+    /**
+     * Retrieve a paginated list of all restaurants.
+     * 
+     * @param pageable pagination and sorting parameters
+     * @return paginated list of restaurants
+     */
+    public Page<RestaurantEntity> getAllRestaurantsPaginated(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable cannot be null");
+        }
+        return restaurantRepository.findAll(pageable);
     }
 
     /**

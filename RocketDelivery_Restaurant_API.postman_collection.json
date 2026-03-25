@@ -1,0 +1,416 @@
+{
+  "info": {
+    "_postman_id": "rocketdelivery-restaurant-api",
+    "name": "RocketDelivery Restaurant API - CRUD Testing",
+    "description": "Complete CRUD testing collection for RocketDelivery Restaurant REST API\n\nThis collection contains sample requests to test all Create, Read, Update, and Delete operations.\n\nBase URL: http://localhost:8080",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. CREATE - Create New Restaurant",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Burger King\",\n  \"email\": \"contact@burgerking.com\",\n  \"phoneNumber\": \"555-1234\",\n  \"street\": \"789 Fast Food Blvd\",\n  \"city\": \"Metropolis\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\",\n  \"description\": \"Fast food restaurant chain\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants"
+          ]
+        },
+        "description": "Create a new restaurant in the database.\n\nExpected Response: HTTP 201 Created\nResponse will include the created restaurant with auto-generated ID"
+      },
+      "response": []
+    },
+    {
+      "name": "2. CREATE - Create Another Restaurant",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"email\": \"info@pizzapalace.com\",\n  \"phoneNumber\": \"555-5678\",\n  \"street\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zipCode\": \"62701\",\n  \"country\": \"USA\",\n  \"description\": \"Authentic Italian pizza restaurant\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants"
+          ]
+        },
+        "description": "Create a second restaurant to have multiple records for testing."
+      },
+      "response": []
+    },
+    {
+      "name": "3. READ - Get All Restaurants (Page 0)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants?page=0&size=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0",
+              "description": "Page number (0-indexed)"
+            },
+            {
+              "key": "size",
+              "value": "10",
+              "description": "Number of records per page"
+            }
+          ]
+        },
+        "description": "Retrieve all restaurants with pagination.\n\nExpected Response: HTTP 200 OK\nResponse includes:\n- content: array of restaurants\n- currentPage: current page number\n- pageSize: number of items per page\n- totalElements: total number of restaurants\n- totalPages: total number of pages\n- isLast: whether this is the last page"
+      },
+      "response": []
+    },
+    {
+      "name": "3. READ - Get All Restaurants (Page 1)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants?page=1&size=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "size",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Get second page of restaurants (if available)."
+      },
+      "response": []
+    },
+    {
+      "name": "3. READ - Get Restaurant by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "1"
+          ]
+        },
+        "description": "Retrieve a specific restaurant by its ID.\n\nExpected Response: HTTP 200 OK with restaurant details\n\nNote: Replace '1' with the actual restaurant ID from the CREATE response"
+      },
+      "response": []
+    },
+    {
+      "name": "3. READ - Get Restaurant Not Found (404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/9999",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "9999"
+          ]
+        },
+        "description": "Test 404 error response when restaurant doesn't exist.\n\nExpected Response: HTTP 404 Not Found with error message"
+      },
+      "response": []
+    },
+    {
+      "name": "4. UPDATE - Update Restaurant",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Burger King Premium\",\n  \"email\": \"premium@burgerking.com\",\n  \"phoneNumber\": \"555-9999\",\n  \"street\": \"999 Premium Avenue\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10010\",\n  \"country\": \"USA\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "1"
+          ]
+        },
+        "description": "Update an existing restaurant's information.\n\nExpected Response: HTTP 200 OK with updated restaurant details\n\nNote: Replace '1' with the actual restaurant ID you want to update"
+      },
+      "response": []
+    },
+    {
+      "name": "4. UPDATE - Update Pizza Palace",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Pizza Palace Express\",\n  \"email\": \"express@pizzapalace.com\",\n  \"phoneNumber\": \"555-7654\",\n  \"street\": \"456 Fast Street\",\n  \"city\": \"Chicago\",\n  \"state\": \"IL\",\n  \"zipCode\": \"60601\",\n  \"country\": \"USA\",\n  \"description\": \"Fast Italian pizza delivery service\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "2"
+          ]
+        },
+        "description": "Update the second restaurant created.\n\nNote: Replace '2' with the correct restaurant ID"
+      },
+      "response": []
+    },
+    {
+      "name": "5. DELETE - Delete Restaurant",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "2"
+          ]
+        },
+        "description": "Delete a restaurant from the database.\n\nExpected Response: HTTP 204 No Content\n\nNote: Replace '2' with the actual restaurant ID you want to delete"
+      },
+      "response": []
+    },
+    {
+      "name": "6. VERIFY - Get Deleted Restaurant (Should be 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/2",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "2"
+          ]
+        },
+        "description": "Verify that the deleted restaurant no longer exists.\n\nExpected Response: HTTP 404 Not Found\n\nNote: Use the ID of the restaurant you just deleted"
+      },
+      "response": []
+    },
+    {
+      "name": "6. VERIFY - Get All Restaurants After Delete",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants?page=0&size=10",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Verify the restaurant count has decreased after deletion.\n\nExpected Response: HTTP 200 OK with one fewer restaurant than before"
+      },
+      "response": []
+    },
+    {
+      "name": "ERROR - Create with Invalid Data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"email\": \"invalid-email\",\n  \"phoneNumber\": \"123\",\n  \"street\": \"Test\",\n  \"city\": \"Test\",\n  \"state\": \"TS\",\n  \"zipCode\": \"12345\",\n  \"country\": \"Test\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants"
+          ]
+        },
+        "description": "Test validation error handling.\n\nExpected Response: HTTP 400 Bad Request with validation error messages"
+      },
+      "response": []
+    },
+    {
+      "name": "ERROR - Update Non-existent Restaurant",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"update@example.com\",\n  \"phoneNumber\": \"555-0000\",\n  \"street\": \"New Street\",\n  \"city\": \"New City\",\n  \"state\": \"XX\",\n  \"zipCode\": \"00000\",\n  \"country\": \"Country\",\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/99999",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "99999"
+          ]
+        },
+        "description": "Test 404 error when updating non-existent restaurant.\n\nExpected Response: HTTP 404 Not Found with error message"
+      },
+      "response": []
+    },
+    {
+      "name": "ERROR - Delete Non-existent Restaurant",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/restaurants/99999",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "restaurants",
+            "99999"
+          ]
+        },
+        "description": "Test 404 error when deleting non-existent restaurant.\n\nExpected Response: HTTP 404 Not Found with error message"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "restaurant_id",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}
