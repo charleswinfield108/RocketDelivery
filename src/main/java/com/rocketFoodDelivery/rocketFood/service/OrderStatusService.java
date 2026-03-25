@@ -154,9 +154,10 @@ public class OrderStatusService {
             status.setDisplayOrder(displayOrder);
         }
 
-        OrderStatusEntity updatedStatus = orderStatusRepository.save(status);
-        log.info("Updated order status: {}", status.getStatusCode());
-        return updatedStatus;
+        @SuppressWarnings("null")
+        OrderStatusEntity updated = orderStatusRepository.save(status);
+        log.info("Updated order status: {}", updated.getStatusCode());
+        return updated;
     }
 
     /**

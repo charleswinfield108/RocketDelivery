@@ -95,13 +95,6 @@ public interface OrderStatusRepository extends JpaRepository<OrderStatusEntity, 
     @Query("SELECT s FROM OrderStatusEntity s ORDER BY s.displayOrder ASC")
     List<OrderStatusEntity> getAllStatusesOrderedByDisplay();
 
-    /**
-     * Get all statuses (both active and inactive) for administrative purposes.
-     *
-     * @return List of all OrderStatusEntity instances
-     */
-    List<OrderStatusEntity> findAll();
-
     // ==================== Terminal Status Methods ====================
 
     /**

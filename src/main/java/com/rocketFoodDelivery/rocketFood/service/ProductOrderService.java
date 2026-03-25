@@ -481,43 +481,6 @@ public class ProductOrderService {
     }
 
     /**
-     * Validate complete line item data consistency.
-     * Called before saving new line items.
-     *
-     * @param lineItem the line item to validate
-     * @throws IllegalArgumentException if validation fails
-     */
-    private void validateLineItem(ProductOrderEntity lineItem) {
-        if (lineItem == null) {
-            throw new IllegalArgumentException("Line item cannot be null");
-        }
-
-        if (lineItem.getOrder() == null) {
-            throw new IllegalArgumentException("Order cannot be null");
-        }
-
-        if (lineItem.getProduct() == null) {
-            throw new IllegalArgumentException("Product cannot be null");
-        }
-
-        validateQuantity(lineItem.getQuantity());
-        validateUnitPrice(lineItem.getUnitPrice());
-        validateSpecialNotes(lineItem.getSpecialNotes());
-
-        // Verify subtotal matches calculation
-        if (lineItem.getSubtotal() == null) {
-            throw new IllegalArgumentException("Subtotal cannot be null");
-        }
-
-        BigDecimal expectedSubtotal = lineItem.getUnitPrice().multiply(new BigDecimal(lineItem.getQuantity()));
-        if (lineItem.getSubtotal().compareTo(expectedSubtotal) != 0) {
-            throw new IllegalArgumentException(
-                "Subtotal mismatch: expected " + expectedSubtotal + " but got " + lineItem.getSubtotal()
-            );
-        }
-    }
-
-    /**
      * Check if a product already exists in an order.
      * Used to enforce unique constraint (order_id, product_id).
      *
