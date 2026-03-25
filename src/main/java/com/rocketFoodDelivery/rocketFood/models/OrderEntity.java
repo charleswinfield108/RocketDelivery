@@ -58,7 +58,7 @@ public class OrderEntity {
      * Human-readable, unique order identifier (e.g., "ORD-20260325-001234").
      * Used for customer reference and support inquiries.
      */
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(name = "order_number", unique = true, nullable = false, length = 50)
     @NotNull(message = "Order number cannot be null")
     @Size(min = 1, max = 50, message = "Order number must be between 1 and 50 characters")
     private String orderNumber;
@@ -99,7 +99,7 @@ public class OrderEntity {
      * Not updatable after creation.
      */
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "order_date", nullable = false, updatable = false)
     @NotNull(message = "Order date cannot be null")
     private LocalDateTime orderDate;
 
@@ -138,7 +138,7 @@ public class OrderEntity {
      * Typically set when order is confirmed (30-60 minutes from order date).
      * Optional; initially null.
      */
-    @Column(nullable = true)
+    @Column(name = "estimated_delivery_time", nullable = true)
     private LocalDateTime estimatedDeliveryTime;
 
     /**
@@ -146,7 +146,7 @@ public class OrderEntity {
      * Set when order status changes to DELIVERED.
      * Optional; remains null until delivery is completed.
      */
-    @Column(nullable = true)
+    @Column(name = "actual_delivery_time", nullable = true)
     private LocalDateTime actualDeliveryTime;
 
     /**
@@ -155,7 +155,7 @@ public class OrderEntity {
      * Maximum 500 characters.
      * Optional field.
      */
-    @Column(nullable = true, length = 500)
+    @Column(name = "special_instructions", nullable = true, length = 500)
     @Size(max = 500, message = "Special instructions must not exceed 500 characters")
     private String specialInstructions;
 
@@ -165,7 +165,7 @@ public class OrderEntity {
      * Not updatable after creation.
      */
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @NotNull(message = "Created timestamp cannot be null")
     private LocalDateTime createdAt;
 
@@ -175,7 +175,7 @@ public class OrderEntity {
      * Initially null; set on first update.
      */
     @UpdateTimestamp
-    @Column(nullable = true)
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
     // ==================== Helper Methods ====================

@@ -71,14 +71,11 @@ public class ProductOrderEntity {
      * Many-to-One relationship: multiple line items can reference the same product.
      * Eager loading to avoid N+1 queries when accessing product details.
      * Do NOT cascade delete: products should persist even if removed from order (for history).
-     *
-     * Note: ProductEntity will be created in a future feature.
-     * Currently referenced as generic entity; will be fully typed when ProductEntity exists.
      */
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     @NotNull(message = "Product cannot be null")
-    private Object product; // TODO: Change to ProductEntity when product-schema feature is complete
+    private ProductEntity product;
 
     /**
      * The number of units of this product ordered.
@@ -133,7 +130,7 @@ public class ProductOrderEntity {
      * Not updatable after creation.
      */
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @NotNull(message = "Created timestamp cannot be null")
     private LocalDateTime createdAt;
 
@@ -143,7 +140,7 @@ public class ProductOrderEntity {
      * Initially null; set on first update.
      */
     @UpdateTimestamp
-    @Column(nullable = true)
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
     // ==================== Helper Methods ====================

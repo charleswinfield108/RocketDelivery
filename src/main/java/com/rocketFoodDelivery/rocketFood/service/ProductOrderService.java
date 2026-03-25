@@ -1,6 +1,7 @@
 package com.rocketFoodDelivery.rocketFood.service;
 
 import com.rocketFoodDelivery.rocketFood.models.OrderEntity;
+import com.rocketFoodDelivery.rocketFood.models.ProductEntity;
 import com.rocketFoodDelivery.rocketFood.models.ProductOrderEntity;
 import com.rocketFoodDelivery.rocketFood.repository.OrderRepository;
 import com.rocketFoodDelivery.rocketFood.repository.ProductOrderRepository;
@@ -79,7 +80,7 @@ public class ProductOrderService {
      */
     public ProductOrderEntity addProductToOrder(
         Long orderId,
-        Object product,
+        ProductEntity product,
         Integer quantity,
         BigDecimal unitPrice,
         String specialNotes

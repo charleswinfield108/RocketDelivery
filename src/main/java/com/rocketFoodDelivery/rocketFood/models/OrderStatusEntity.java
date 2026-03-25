@@ -61,7 +61,7 @@ public class OrderStatusEntity {
      * Must be unique, uppercase with underscores (convention).
      * Immutable reference data.
      */
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(name = "status_code", unique = true, nullable = false, length = 50)
     @NotNull(message = "Status code cannot be null")
     @Size(min = 1, max = 50, message = "Status code must be between 1 and 50 characters")
     private String statusCode;
@@ -73,7 +73,7 @@ public class OrderStatusEntity {
      * Must be unique; allows customers to identify order state.
      * Immutable reference data.
      */
-    @Column(unique = true, nullable = false, length = 100)
+    @Column(name = "status_name", unique = true, nullable = false, length = 100)
     @NotNull(message = "Status name cannot be null")
     @Size(min = 1, max = 100, message = "Status name must be between 1 and 100 characters")
     private String statusName;
@@ -98,7 +98,7 @@ public class OrderStatusEntity {
      * Used for sorting in SELECT statements and UI rendering.
      * Examples: PENDING=1, CONFIRMED=2, PREPARING=3, READY=4, OUT_FOR_DELIVERY=5, DELIVERED=6, CANCELLED=7
      */
-    @Column(nullable = false)
+    @Column(name = "display_order", nullable = false)
     @NotNull(message = "Display order cannot be null")
     @Min(value = 1, message = "Display order must be at least 1")
     @Max(value = 10, message = "Display order cannot exceed 10")
@@ -111,7 +111,7 @@ public class OrderStatusEntity {
      * Enables backward compatibility without losing historical data.
      * Default: true
      */
-    @Column(nullable = false)
+    @Column(name = "is_active", nullable = false)
     @NotNull(message = "Active flag cannot be null")
     private Boolean isActive = true;
 
@@ -121,7 +121,7 @@ public class OrderStatusEntity {
      * Not updatable after creation.
      */
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @NotNull(message = "Created timestamp cannot be null")
     private LocalDateTime createdAt;
 
@@ -131,7 +131,7 @@ public class OrderStatusEntity {
      * Initially null; set on first update.
      */
     @UpdateTimestamp
-    @Column(nullable = true)
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
     // ==================== Helper Methods ====================
