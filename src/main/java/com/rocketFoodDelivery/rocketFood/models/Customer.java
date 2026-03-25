@@ -30,7 +30,7 @@ public class Customer {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "address_id" , nullable = false)
-    private Address address;
+    private AddressEntity address;
 
     @Column(columnDefinition = "boolean default true")
     private boolean active;

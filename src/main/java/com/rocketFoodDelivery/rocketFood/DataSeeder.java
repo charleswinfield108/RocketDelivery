@@ -30,8 +30,8 @@ public class DataSeeder {
 
                 // Clear existing data from the database
                 customerRepository.deleteAll();
-                userRepository.deleteAll();
                 addressRepository.deleteAll();
+                userRepository.deleteAll();
 
                 // Seed new data
                 UserEntity user = new UserEntity();
@@ -41,11 +41,15 @@ public class DataSeeder {
                 user.setPhoneNumber("1234567890");
                 userRepository.save(user);
 
-                Address address = Address.builder()
-                                .street_address("123 Coding Ave.")
-                                .city("Paradise City")
-                                .postal_code("422211")
-                                .build();
+                AddressEntity address = new AddressEntity();
+                address.setUser(user);
+                address.setStreet("123 Coding Ave.");
+                address.setCity("Paradise City");
+                address.setState("CA");
+                address.setZipCode("42221");
+                address.setCountry("USA");
+                address.setAddressType("HOME");
+                address.setIsDefault(true);
                 addressRepository.save(address);
 
                 Customer customer = Customer.builder()
