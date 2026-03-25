@@ -11,14 +11,17 @@ import java.time.LocalDateTime;
 /**
  * JPA Entity representing a restaurant in the RocketFoodDelivery system.
  * 
- * Stores restaurant information including basic details and operational status.
+ * Stores restaurant information including basic details, ownership, and operational status.
+ * Each restaurant is owned by a user and can employ multiple employees.
  */
 @Entity
 @Table(
     name = "restaurants",
     indexes = {
         @Index(name = "idx_name", columnList = "name"),
-        @Index(name = "idx_is_active", columnList = "is_active")
+        @Index(name = "idx_is_active", columnList = "is_active"),
+        @Index(name = "idx_owner_id", columnList = "owner_id"),
+        @Index(name = "idx_owner_active", columnList = "owner_id, is_active")
     }
 )
 @Data
@@ -36,6 +39,20 @@ public class RestaurantEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
+    /**
+     * Reference to the user who owns this restaurant.
+     * ManyToOne relationship - multiple restaurants can be owned by one user.
+     * Cannot be null - every restaurant must have an owner.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "owner_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_restaurant_owner")
+    )
+    @NotNull(message = "Owner cannot be null")
+    private UserEntity owner;
 
     /**
      * Restaurant name.
@@ -147,14 +164,25 @@ public class RestaurantEntity {
         return address.toString();
     }
 
+    /**
+     * Checks if the restaurant is currently active.
+     * 
+     * @return true if isActive is TRUE
+     */
+    public boolean isActive() {
+        return Boolean.TRUE.equals(isActive);
+    }
+
     @Override
     public String toString() {
         return "RestaurantEntity{" +
                 "id=" + id +
+                ", ownerId=" + (owner != null ? owner.getId() : null) +
                 ", name='" + name + '\'' +
                 ", city='" + city + '\'' +
                 ", isActive=" + isActive +
                 ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
