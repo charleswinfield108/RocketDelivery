@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Back Office - Restaurants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-edit {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-edit:hover {
+            background-color: #218838;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state h2 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+            color: #666;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Back Office</h1>
+                <p>Restaurant Management Dashboard</p>
+            </div>
+            <a href="/backoffice/restaurants/new" class="btn btn-primary">+ Create New Restaurant</a>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <!-- Statistics Bar -->
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Total Restaurants</div>
+                <div class="stat-value" th:text="${restaurantCount ?: 0}"></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Active Restaurants</div>
+                <div class="stat-value" th:text="${#lists.size(restaurants)}"></div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Last Updated</div>
+                <div class="stat-value">Today</div>
+            </div>
+        </div>
+
+        <!-- Restaurants Table -->
+        <div th:if="${!restaurants.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="restaurant : ${restaurants}">
+                        <td th:text="${restaurant.name}"></td>
+                        <td th:text="${restaurant.email}"></td>
+                        <td th:text="${restaurant.phoneNumber}"></td>
+                        <td th:text="${restaurant.city}"></td>
+                        <td>
+                            <span th:classappend="${restaurant.isActive ? 'status-active' : 'status-inactive'}" class="status-badge">
+                                <span th:text="${restaurant.isActive ? 'Active' : 'Inactive'}"></span>
+                            </span>
+                        </td>
+                        <td th:text="${#dates.format(restaurant.createdAt, 'MMM dd, yyyy')}"></td>
+                        <td>
+                            <div class="actions">
+                                <a th:href="@{/backoffice/restaurants/{id}/edit(id=${restaurant.id})}" class="btn btn-edit">Edit</a>
+                                <a th:href="@{/backoffice/restaurants/{id}/delete(id=${restaurant.id})}" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this restaurant?');">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${restaurants.isEmpty()}" class="empty-state">
+            <h2>No Restaurants Found</h2>
+            <p>Create your first restaurant to get started.</p>
+            <a href="/backoffice/restaurants/new" class="btn btn-primary" style="margin-top: 20px;">Create Restaurant</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>RocketDelivery Back Office • Restaurant Management System</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application Properties ###
+# Never commit application.properties with database credentials
+src/main/resources/application.properties
+*.properties.local
+.env
+.env.local

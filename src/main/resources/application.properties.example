@@ -1,0 +1,28 @@
+# RocketDelivery Database Configuration
+# Copy this file to application.properties and fill in your credentials
+# NEVER commit application.properties to Git
+
+# MySQL Database Connection
+spring.datasource.url=jdbc:mysql://localhost:3306/rocketfood
+spring.datasource.username=root
+spring.datasource.password=YOUR_PASSWORD_HERE
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+
+# Data Seeding
+# Uncomment to seed the database with sample data upon startup
+# spring.profiles.active=manual-seeding
+
+# Thymeleaf Configuration
+spring.thymeleaf.mode=HTML
+spring.thymeleaf.cache=false
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+
+# Jackson Configuration (for JSON responses)
+spring.jackson.serialization.write-dates-as-timestamps=false
+spring.jackson.serialization.indent-output=true
