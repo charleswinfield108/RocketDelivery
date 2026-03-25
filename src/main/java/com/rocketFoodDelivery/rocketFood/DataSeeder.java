@@ -25,7 +25,7 @@ public class DataSeeder {
         }
 
         @PostConstruct
-        @SuppressWarnings("null")
+        @SuppressWarnings({"null", "deprecation"})
         public void seedData() {
 
                 // Clear existing data from the database
