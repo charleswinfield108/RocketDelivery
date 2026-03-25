@@ -2,6 +2,7 @@ package com.rocketFoodDelivery.rocketFood;
 
 import com.rocketFoodDelivery.rocketFood.models.*;
 import com.rocketFoodDelivery.rocketFood.repository.*;
+import com.rocketFoodDelivery.rocketFood.service.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -18,23 +19,29 @@ public class DataSeeder {
         private final AddressRepository addressRepository;
         private final RestaurantRepository restaurantRepository;
         private final OrderRepository orderRepository;
+        private final OrderStatusService orderStatusService;
 
         @Autowired
         public DataSeeder(UserRepository userRepository,
                         CustomerRepository customerRepository,
                         AddressRepository addressRepository,
                         RestaurantRepository restaurantRepository,
-                        OrderRepository orderRepository) {
+                        OrderRepository orderRepository,
+                        OrderStatusService orderStatusService) {
                 this.userRepository = userRepository;
                 this.customerRepository = customerRepository;
                 this.addressRepository = addressRepository;
                 this.restaurantRepository = restaurantRepository;
                 this.orderRepository = orderRepository;
+                this.orderStatusService = orderStatusService;
         }
 
         @PostConstruct
         @SuppressWarnings("null")
         public void seedData() {
+
+                // Initialize order statuses (reference data)
+                orderStatusService.initializeReferenceData();
 
                 // Clear existing data from the database (in reverse dependency order)
                 orderRepository.deleteAll();
