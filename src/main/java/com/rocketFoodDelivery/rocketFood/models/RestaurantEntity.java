@@ -1,5 +1,6 @@
 package com.rocketFoodDelivery.rocketFood.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -45,6 +46,7 @@ public class RestaurantEntity {
      * ManyToOne relationship - multiple restaurants can be owned by one user.
      * Set by the service layer during creation - can be null during form binding.
      */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
         name = "owner_id",
