@@ -343,9 +343,9 @@ Response includes:
 - **Database Design** - Normalization and schema design
 
 ### Project Documentation
-- **Back Office Guide** → [BACK_OFFICE_IMPLEMENTATION_REPORT.md](BACK_OFFICE_IMPLEMENTATION_REPORT.md)
-- **Testing Guide** → [TESTING.md](TESTING.md)
-- **Quick Start** → [QUICK_START.md](QUICK_START.md)
+- **Back Office Guide** → [docs/BACK_OFFICE_IMPLEMENTATION_REPORT.md](docs/BACK_OFFICE_IMPLEMENTATION_REPORT.md)
+- **Testing Guide** → [docs/TESTING.md](docs/TESTING.md)
+- **Quick Start** → [docs/QUICK_START.md](docs/QUICK_START.md)
 - **AI Features** → [docs/ai/features/](docs/ai/features/)
 
 ### Development Guides
