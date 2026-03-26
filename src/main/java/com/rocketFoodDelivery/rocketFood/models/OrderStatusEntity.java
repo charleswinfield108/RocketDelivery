@@ -122,7 +122,6 @@ public class OrderStatusEntity {
      */
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    @NotNull(message = "Created timestamp cannot be null")
     private LocalDateTime createdAt;
 
     /**

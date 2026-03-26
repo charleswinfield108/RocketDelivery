@@ -136,7 +136,7 @@
         </div>
         
         <div class="error-details">
-            <p><strong>Timestamp:</strong> <span th:text="${#dates.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}">N/A</span></p>
+            <p><strong>Timestamp:</strong> <span th:text="${#temporals.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}">N/A</span></p>
             <p><strong>Request Method:</strong> <span th:text="${status}">N/A</span></p>
             <p th:if="${message}"><strong>Error:</strong> <span th:text="${message}">N/A</span></p>
             <div th:if="${trace}" class="stack-trace">

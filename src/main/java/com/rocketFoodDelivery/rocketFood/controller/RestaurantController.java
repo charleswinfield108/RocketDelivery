@@ -107,6 +107,7 @@ public class RestaurantController {
      * POST /backoffice/restaurants
      *
      * @param restaurant the restaurant entity from form binding
+     * @param ownerId the owner ID from the form selection
      * @param bindingResult validation result from @Valid
      * @param redirectAttributes for flash messages
      * @return redirect to list on success, or back to form on error
@@ -114,6 +115,7 @@ public class RestaurantController {
     @PostMapping
     public String createRestaurant(
         @Valid @ModelAttribute("restaurant") RestaurantEntity restaurant,
+        @RequestParam(required = false) Long ownerId,
         BindingResult bindingResult,
         RedirectAttributes redirectAttributes) {
 
@@ -123,11 +125,13 @@ public class RestaurantController {
         }
 
         try {
-            // TODO: In future, get owner ID from logged-in user
-            // For now, use first user or throw error if no users
-            Long ownerId = getDefaultOwnerId();
+            // Use the selected owner ID, or default to first user if not provided
+            Long effectiveOwnerId = ownerId;
+            if (effectiveOwnerId == null) {
+                effectiveOwnerId = getDefaultOwnerId();
+            }
 
-            RestaurantEntity createdRestaurant = restaurantService.createRestaurant(ownerId, restaurant);
+            RestaurantEntity createdRestaurant = restaurantService.createRestaurant(effectiveOwnerId, restaurant);
             log.info("Restaurant created successfully: {} (ID: {})", createdRestaurant.getName(), createdRestaurant.getId());
 
             redirectAttributes.addFlashAttribute("successMessage",

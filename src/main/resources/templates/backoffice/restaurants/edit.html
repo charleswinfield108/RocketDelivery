@@ -211,8 +211,8 @@
         <!-- Restaurant Metadata -->
         <div class="restaurant-meta">
             <div class="meta-item"><span class="meta-label">ID:</span> <span th:text="${restaurant.id}"></span></div>
-            <div class="meta-item"><span class="meta-label">Created:</span> <span th:text="${#dates.format(restaurant.createdAt, 'MMM dd, yyyy HH:mm')}"></span></div>
-            <div class="meta-item" th:if="${restaurant.updatedAt}"><span class="meta-label">Last Updated:</span> <span th:text="${#dates.format(restaurant.updatedAt, 'MMM dd, yyyy HH:mm')}"></span></div>
+            <div class="meta-item"><span class="meta-label">Created:</span> <span th:text="${#temporals.format(restaurant.createdAt, 'MMM dd, yyyy HH:mm')}"></span></div>
+            <div class="meta-item" th:if="${restaurant.updatedAt}"><span class="meta-label">Last Updated:</span> <span th:text="${#temporals.format(restaurant.updatedAt, 'MMM dd, yyyy HH:mm')}"></span></div>
             <div class="meta-item"><span class="meta-label">Status:</span> <span th:text="${restaurant.isActive ? 'Active' : 'Inactive'}"></span></div>
         </div>
 

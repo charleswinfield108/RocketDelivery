@@ -43,7 +43,7 @@ public class RestaurantEntity {
     /**
      * Reference to the user who owns this restaurant.
      * ManyToOne relationship - multiple restaurants can be owned by one user.
-     * Cannot be null - every restaurant must have an owner.
+     * Set by the service layer during creation - can be null during form binding.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -51,7 +51,6 @@ public class RestaurantEntity {
         nullable = false,
         foreignKey = @ForeignKey(name = "fk_restaurant_owner")
     )
-    @NotNull(message = "Owner cannot be null")
     private UserEntity owner;
 
     /**

@@ -194,6 +194,16 @@
 
         <!-- Form -->
         <form th:action="@{/backoffice/restaurants}" th:object="${restaurant}" method="post">
+            <!-- Owner Selection -->
+            <div class="form-group">
+                <label for="ownerId">Owner <span class="required">*</span></label>
+                <select id="ownerId" name="ownerId" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <option value="">-- Select Restaurant Owner --</option>
+                    <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.firstName} + ' ' + ${user.lastName} + ' (' + ${user.email} + ')'"></option>
+                </select>
+                <span class="form-hint" th:if="${users.isEmpty()}">No users available. Please create a user first.</span>
+            </div>
+
             <!-- Basic Information -->
             <div class="form-group" th:classappend="${#fields.hasErrors('name') ? 'has-error' : ''}">
                 <label for="name">Restaurant Name <span class="required">*</span></label>

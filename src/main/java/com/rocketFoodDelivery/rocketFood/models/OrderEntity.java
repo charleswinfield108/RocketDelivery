@@ -100,7 +100,6 @@ public class OrderEntity {
      */
     @CreationTimestamp
     @Column(name = "order_date", nullable = false, updatable = false)
-    @NotNull(message = "Order date cannot be null")
     private LocalDateTime orderDate;
 
     /**
@@ -166,7 +165,6 @@ public class OrderEntity {
      */
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    @NotNull(message = "Created timestamp cannot be null")
     private LocalDateTime createdAt;
 
     /**

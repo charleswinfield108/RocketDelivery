@@ -124,7 +124,7 @@
         
         <div class="error-details">
             <p><strong>Request Path:</strong> <span th:text="${path}">N/A</span></p>
-            <p><strong>Timestamp:</strong> <span th:text="${#dates.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}">N/A</span></p>
+            <p><strong>Timestamp:</strong> <span th:text="${#temporals.format(timestamp, 'yyyy-MM-dd HH:mm:ss')}">N/A</span></p>
         </div>
         
         <div class="action-buttons">

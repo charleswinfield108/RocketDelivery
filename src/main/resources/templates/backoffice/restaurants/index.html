@@ -296,7 +296,7 @@
                                 <span th:text="${restaurant.isActive ? 'Active' : 'Inactive'}"></span>
                             </span>
                         </td>
-                        <td th:text="${#dates.format(restaurant.createdAt, 'MMM dd, yyyy')}"></td>
+                        <td th:text="${#temporals.format(restaurant.createdAt, 'MMM dd, yyyy')}"></td>
                         <td>
                             <div class="actions">
                                 <a th:href="@{/backoffice/restaurants/{id}/edit(id=${restaurant.id})}" class="btn btn-edit">Edit</a>

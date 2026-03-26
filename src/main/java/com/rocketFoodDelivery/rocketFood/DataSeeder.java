@@ -96,6 +96,7 @@ public class DataSeeder {
 
                 // Seed Orders
                 OrderEntity order1 = new OrderEntity();
+                order1.setOrderNumber("ORD-20260326-001");
                 order1.setCustomer(customer);
                 order1.setRestaurant(restaurant);
                 order1.setDeliveryAddress(customerAddress);
@@ -105,6 +106,7 @@ public class DataSeeder {
                 orderRepository.save(order1);
 
                 OrderEntity order2 = new OrderEntity();
+                order2.setOrderNumber("ORD-20260326-002");
                 order2.setCustomer(customer);
                 order2.setRestaurant(restaurant);
                 order2.setDeliveryAddress(customerAddress);
