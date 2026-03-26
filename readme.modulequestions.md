@@ -3,38 +3,17 @@
 
 ## 📋 Table of Contents
 
-1. [🔧 Dependencies](#-dependencies)
-2. [📦 Instructions](#-instructions)
-3. [🗄️ Relational Databases & SQL Guide](#️-relational-databases--sql-a-guide-for-rocketdelivery)
-4. [🔍 What is SQL?](#-what-is-sql)
-5. [⚖️ SQLite vs MySQL](#️-what-is-the-main-difference-between-sqlite-and-mysql)
-6. [🔐 Primary and Foreign Keys](#-what-are-primary-and-foreign-keys)
-7. [🔗 Relationship Types](#-what-are-the-different-relationship-types-in-a-relational-database)
-8. [📊 Analyzing the RocketDelivery ERD](#-analyzing-the-rocketdelivery-entity-relationship-diagram-erd)
-9. [🧪 Test-Driven Development (TDD)](#🧪-test-driven-development-tdd-in-java-a-guide-for-rocketdelivery)
-10. [✅ Getting Started with TDD](#-getting-started-with-tdd-in-rocketdelivery)
+1. [�️ Relational Databases & SQL Guide](#️-relational-databases--sql-a-guide-for-rocketdelivery)
+2. [🔍 What is SQL?](#-what-is-sql)
+3. [⚖️ SQLite vs MySQL](#️-what-is-the-main-difference-between-sqlite-and-mysql)
+4. [🔐 Primary and Foreign Keys](#-what-are-primary-and-foreign-keys)
+5. [🔗 Relationship Types](#-what-are-the-different-relationship-types-in-a-relational-database)
+6. [📊 Analyzing the RocketDelivery ERD](#-analyzing-the-rocketdelivery-entity-relationship-diagram-erd)
+7. [🧪 Test-Driven Development (TDD)](#🧪-test-driven-development-tdd-in-java-a-guide-for-rocketdelivery)
+8. [✅ Getting Started with TDD](#-getting-started-with-tdd-in-rocketdelivery)
 
 ---
 
-## 🔧 Dependencies
-To run this application properly on your local machine, you'll need Java 17 and MySQL installed. All other dependencies are already defined in the pom.xml file.
-
-## 📦 Instructions
-1. Make sure environment variables are properly set (this should already be the case)
-2. Log into your MySQL console
-3. Create a database named rdelivery
-4. Clone the project
-5. Open the project in VS Code
-6. Edit your database configuration file (src/main/resources/application.properties)
-    1. Edit the username, password and database name as required
-7. Execute the main function
-    1. Open the RocketFoodApplication.java file and run it (on the top right part of VS Code, you should see an arrow pointing to the right, when you hover over it, you see a “Run Java” tooltip. Click it.
-    2.  You should see a line similar to this at the end of the execution: `INFO 24016 --- [ main] c.r.rocketFood.RocketFoodApplication : Started RocketFoodApplication in 2.726 seconds (process running for 2.963)`
-
-
-    CHECKING FOR UPDATE!!!
-
----
 
 # 🗄️ Relational Databases & SQL: A Guide for RocketDelivery
 
