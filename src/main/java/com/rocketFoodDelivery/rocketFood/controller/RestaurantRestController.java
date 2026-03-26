@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Comprehensive REST API Controller for All Back Office CRUD Operations.
@@ -759,6 +761,26 @@ public class RestaurantRestController {
             throw new RuntimeException("No users found in system. Please create a user first.");
         }
         return users.get(0).getId();
+    }
+
+    /**
+     * Handle validation errors for request body validation.
+     * Returns detailed error messages for each validation failure.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException e) {
+        Map<String, Object> errors = new HashMap<>();
+        Map<String, String> fieldErrors = new HashMap<>();
+        
+        e.getBindingResult().getFieldErrors().forEach(error ->
+            fieldErrors.put(error.getField(), error.getDefaultMessage())
+        );
+        
+        errors.put("error", "Validation failed");
+        errors.put("validationErrors", fieldErrors);
+        errors.put("timestamp", System.currentTimeMillis());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
 }
