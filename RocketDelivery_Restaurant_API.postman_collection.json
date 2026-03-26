@@ -22,7 +22,7 @@
           "raw": "{\n  \"name\": \"Burger King\",\n  \"email\": \"contact@burgerking.com\",\n  \"phoneNumber\": \"555-1234\",\n  \"street\": \"789 Fast Food Blvd\",\n  \"city\": \"Metropolis\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\",\n  \"description\": \"Fast food restaurant chain\",\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/restaurants",
+          "raw": "http://localhost:8080/api/v1/restaurants",
           "protocol": "http",
           "host": [
             "localhost"
@@ -30,6 +30,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants"
           ]
         },
@@ -53,7 +54,7 @@
           "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"email\": \"info@pizzapalace.com\",\n  \"phoneNumber\": \"555-5678\",\n  \"street\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zipCode\": \"62701\",\n  \"country\": \"USA\",\n  \"description\": \"Authentic Italian pizza restaurant\",\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/restaurants",
+          "raw": "http://localhost:8080/api/v1/restaurants",
           "protocol": "http",
           "host": [
             "localhost"
@@ -61,6 +62,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants"
           ]
         },
@@ -74,7 +76,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants?page=0&size=10",
+          "raw": "http://localhost:8080/api/v1/restaurants?page=0&size=10",
           "protocol": "http",
           "host": [
             "localhost"
@@ -82,6 +84,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants"
           ],
           "query": [
@@ -107,7 +110,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants?page=1&size=10",
+          "raw": "http://localhost:8080/api/v1/restaurants?page=1&size=10",
           "protocol": "http",
           "host": [
             "localhost"
@@ -115,6 +118,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants"
           ],
           "query": [
@@ -138,7 +142,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/1",
+          "raw": "http://localhost:8080/api/v1/restaurants/1",
           "protocol": "http",
           "host": [
             "localhost"
@@ -146,6 +150,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "1"
           ]
@@ -160,7 +165,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/9999",
+          "raw": "http://localhost:8080/api/v1/restaurants/9999",
           "protocol": "http",
           "host": [
             "localhost"
@@ -168,6 +173,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "9999"
           ]
@@ -192,7 +198,7 @@
           "raw": "{\n  \"name\": \"Burger King Premium\",\n  \"email\": \"premium@burgerking.com\",\n  \"phoneNumber\": \"555-9999\",\n  \"street\": \"999 Premium Avenue\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10010\",\n  \"country\": \"USA\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/1",
+          "raw": "http://localhost:8080/api/v1/restaurants/1",
           "protocol": "http",
           "host": [
             "localhost"
@@ -200,6 +206,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "1"
           ]
@@ -224,7 +231,7 @@
           "raw": "{\n  \"name\": \"Pizza Palace Express\",\n  \"email\": \"express@pizzapalace.com\",\n  \"phoneNumber\": \"555-7654\",\n  \"street\": \"456 Fast Street\",\n  \"city\": \"Chicago\",\n  \"state\": \"IL\",\n  \"zipCode\": \"60601\",\n  \"country\": \"USA\",\n  \"description\": \"Fast Italian pizza delivery service\",\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/2",
+          "raw": "http://localhost:8080/api/v1/restaurants/2",
           "protocol": "http",
           "host": [
             "localhost"
@@ -232,6 +239,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "2"
           ]
@@ -246,7 +254,7 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/2",
+          "raw": "http://localhost:8080/api/v1/restaurants/2",
           "protocol": "http",
           "host": [
             "localhost"
@@ -254,6 +262,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "2"
           ]
@@ -268,7 +277,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/2",
+          "raw": "http://localhost:8080/api/v1/restaurants/2",
           "protocol": "http",
           "host": [
             "localhost"
@@ -276,6 +285,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "2"
           ]
@@ -290,7 +300,7 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants?page=0&size=10",
+          "raw": "http://localhost:8080/api/v1/restaurants?page=0&size=10",
           "protocol": "http",
           "host": [
             "localhost"
@@ -298,6 +308,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants"
           ],
           "query": [
@@ -331,7 +342,7 @@
           "raw": "{\n  \"name\": \"\",\n  \"email\": \"invalid-email\",\n  \"phoneNumber\": \"123\",\n  \"street\": \"Test\",\n  \"city\": \"Test\",\n  \"state\": \"TS\",\n  \"zipCode\": \"12345\",\n  \"country\": \"Test\",\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/restaurants",
+          "raw": "http://localhost:8080/api/v1/restaurants",
           "protocol": "http",
           "host": [
             "localhost"
@@ -339,6 +350,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants"
           ]
         },
@@ -362,7 +374,7 @@
           "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"update@example.com\",\n  \"phoneNumber\": \"555-0000\",\n  \"street\": \"New Street\",\n  \"city\": \"New City\",\n  \"state\": \"XX\",\n  \"zipCode\": \"00000\",\n  \"country\": \"Country\",\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/99999",
+          "raw": "http://localhost:8080/api/v1/restaurants/99999",
           "protocol": "http",
           "host": [
             "localhost"
@@ -370,6 +382,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "99999"
           ]
@@ -384,7 +397,7 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/restaurants/99999",
+          "raw": "http://localhost:8080/api/v1/restaurants/99999",
           "protocol": "http",
           "host": [
             "localhost"
@@ -392,6 +405,7 @@
           "port": "8080",
           "path": [
             "api",
+            "v1",
             "restaurants",
             "99999"
           ]
