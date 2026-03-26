@@ -19,7 +19,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Burger King\",\n  \"email\": \"contact@burgerking.com\",\n  \"phoneNumber\": \"555-1234\",\n  \"street\": \"789 Fast Food Blvd\",\n  \"city\": \"Metropolis\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\",\n  \"description\": \"Fast food restaurant chain\",\n  \"isActive\": true\n}"
+          "raw": "{\n  \"name\": \"Burger King\",\n  \"email\": \"contact@burgerking.com\",\n  \"phoneNumber\": \"(555) 123-4567\",\n  \"street\": \"789 Fast Food Blvd\",\n  \"city\": \"Metropolis\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\",\n  \"description\": \"Fast food restaurant chain\",\n  \"isActive\": true\n}"
         },
         "url": {
           "raw": "http://localhost:8080/api/v1/restaurants",
@@ -51,7 +51,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"email\": \"info@pizzapalace.com\",\n  \"phoneNumber\": \"555-5678\",\n  \"street\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zipCode\": \"62701\",\n  \"country\": \"USA\",\n  \"description\": \"Authentic Italian pizza restaurant\",\n  \"isActive\": true\n}"
+          "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"email\": \"info@pizzapalace.com\",\n  \"phoneNumber\": \"(555) 567-8901\",\n  \"street\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zipCode\": \"62701\",\n  \"country\": \"USA\",\n  \"description\": \"Authentic Italian pizza restaurant\",\n  \"isActive\": true\n}"
         },
         "url": {
           "raw": "http://localhost:8080/api/v1/restaurants",
@@ -195,7 +195,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Burger King Premium\",\n  \"email\": \"premium@burgerking.com\",\n  \"phoneNumber\": \"555-9999\",\n  \"street\": \"999 Premium Avenue\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10010\",\n  \"country\": \"USA\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"isActive\": true\n}"
+          "raw": "{\n  \"name\": \"Burger King Premium\",\n  \"email\": \"premium@burgerking.com\",\n  \"phoneNumber\": \"(555) 999-9999\",\n  \"street\": \"999 Premium Avenue\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10010\",\n  \"country\": \"USA\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"isActive\": true\n}"
         },
         "url": {
           "raw": "http://localhost:8080/api/v1/restaurants/1",
@@ -228,7 +228,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Pizza Palace Express\",\n  \"email\": \"express@pizzapalace.com\",\n  \"phoneNumber\": \"555-7654\",\n  \"street\": \"456 Fast Street\",\n  \"city\": \"Chicago\",\n  \"state\": \"IL\",\n  \"zipCode\": \"60601\",\n  \"country\": \"USA\",\n  \"description\": \"Fast Italian pizza delivery service\",\n  \"isActive\": true\n}"
+          "raw": "{\n  \"name\": \"Pizza Palace Express\",\n  \"email\": \"express@pizzapalace.com\",\n  \"phoneNumber\": \"(555) 765-4321\",\n  \"street\": \"456 Fast Street\",\n  \"city\": \"Chicago\",\n  \"state\": \"IL\",\n  \"zipCode\": \"60601\",\n  \"country\": \"USA\",\n  \"description\": \"Fast Italian pizza delivery service\",\n  \"isActive\": true\n}"
         },
         "url": {
           "raw": "http://localhost:8080/api/v1/restaurants/2",
@@ -371,7 +371,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"update@example.com\",\n  \"phoneNumber\": \"555-0000\",\n  \"street\": \"New Street\",\n  \"city\": \"New City\",\n  \"state\": \"XX\",\n  \"zipCode\": \"00000\",\n  \"country\": \"Country\",\n  \"isActive\": true\n}"
+          "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"update@example.com\",\n  \"phoneNumber\": \"(555) 000-0000\",\n  \"street\": \"New Street\",\n  \"city\": \"New City\",\n  \"state\": \"XX\",\n  \"zipCode\": \"00000\",\n  \"country\": \"Country\",\n  \"isActive\": true\n}"
         },
         "url": {
           "raw": "http://localhost:8080/api/v1/restaurants/99999",
