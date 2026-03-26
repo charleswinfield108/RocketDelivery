@@ -1,8 +1,25 @@
 
-# Dependencies
+# 📚 Module 11 Questions - RocketDelivery Database & API Design
+
+## 📋 Table of Contents
+
+1. [🔧 Dependencies](#-dependencies)
+2. [📦 Instructions](#-instructions)
+3. [🗄️ Relational Databases & SQL Guide](#️-relational-databases--sql-a-guide-for-rocketdelivery)
+4. [🔍 What is SQL?](#-what-is-sql)
+5. [⚖️ SQLite vs MySQL](#️-what-is-the-main-difference-between-sqlite-and-mysql)
+6. [🔐 Primary and Foreign Keys](#-what-are-primary-and-foreign-keys)
+7. [🔗 Relationship Types](#-what-are-the-different-relationship-types-in-a-relational-database)
+8. [📊 Analyzing the RocketDelivery ERD](#-analyzing-the-rocketdelivery-entity-relationship-diagram-erd)
+9. [🧪 Test-Driven Development (TDD)](#🧪-test-driven-development-tdd-in-java-a-guide-for-rocketdelivery)
+10. [✅ Getting Started with TDD](#-getting-started-with-tdd-in-rocketdelivery)
+
+---
+
+## 🔧 Dependencies
 To run this application properly on your local machine, you'll need Java 17 and MySQL installed. All other dependencies are already defined in the pom.xml file.
 
-# Instructions
+## 📦 Instructions
 1. Make sure environment variables are properly set (this should already be the case)
 2. Log into your MySQL console
 3. Create a database named rdelivery
@@ -19,11 +36,11 @@ To run this application properly on your local machine, you'll need Java 17 and 
 
 ---
 
-# Relational Databases & SQL: A Guide for RocketDelivery
+# 🗄️ Relational Databases & SQL: A Guide for RocketDelivery
 
 This project uses **MySQL**, a relational database system, to manage structured data for the food delivery platform. This guide explains the fundamentals of SQL and relational databases to help understand how data is organized and queried in RocketDelivery.
 
-## What is SQL?
+## 🔍 What is SQL?
 
 **SQL** (Structured Query Language) is a standardized programming language designed specifically for managing and querying relational databases. SQL allows developers and administrators to communicate with databases using a set of commands that follow a consistent syntax across different database systems.
 
@@ -49,7 +66,7 @@ UPDATE restaurants SET closing_time = '22:00' WHERE id = 1;
 
 ---
 
-## What is the Main Difference Between SQLite and MySQL?
+## ⚖️ What is the Main Difference Between SQLite and MySQL?
 
 While both SQLite and MySQL are relational databases that use SQL, they differ significantly in architecture, scalability, and use cases:
 
@@ -75,9 +92,9 @@ SQLite would be insufficient for these requirements because it cannot efficientl
 
 ---
 
-## What are Primary and Foreign Keys?
+## 🔐 What are Primary and Foreign Keys?
 
-### **Primary Key**
+### **🔑 Primary Key**
 
 A **Primary Key** is a column (or set of columns) that uniquely identifies each row in a table. Every table should have exactly one primary key. The primary key ensures:
 - **Uniqueness:** No two rows can have the same primary key value
@@ -104,7 +121,7 @@ In this example:
 - Each restaurant has a unique ID, so Restaurant ID 5 is always the same restaurant
 - Other tables can reference this restaurant using its `id`
 
-### **Foreign Key**
+### **🔗 Foreign Key**
 
 A **Foreign Key** is a column in one table that references the primary key of another table. Foreign keys establish relationships between tables and maintain **referential integrity**, ensuring that:
 - You cannot insert a customer order for a restaurant ID that doesn't exist
@@ -142,11 +159,11 @@ Without the foreign key constraint, the database might allow an order to referen
 
 ---
 
-## What are the Different Relationship Types in a Relational Database?
+## 🔗 What are the Different Relationship Types in a Relational Database?
 
 Relational databases use three main relationship types to connect data between tables:
 
-### **1. One-to-One (1:1) Relationship**
+### **1️⃣ One-to-One (1:1) Relationship**
 
 In a one-to-one relationship, a single row in Table A is associated with exactly one row in Table B, and vice versa.
 
@@ -174,7 +191,7 @@ CREATE TABLE user_profiles (
 
 ---
 
-### **2. One-to-Many (1:N) Relationship**
+### **📈 One-to-Many (1:N) Relationship**
 
 In a one-to-many relationship, one row in Table A can be associated with multiple rows in Table B, but each row in Table B is associated with only one row in Table A.
 
@@ -207,7 +224,7 @@ CREATE TABLE employees (
 
 ---
 
-### **3. Many-to-Many (M:N) Relationship**
+### **♾️ Many-to-Many (M:N) Relationship**
 
 In a many-to-many relationship, multiple rows in Table A can be associated with multiple rows in Table B. This relationship requires a **junction table** (also called a join table or throughput table) to connect the two tables.
 
@@ -265,7 +282,7 @@ The junction table `order_items` stores these connections, allowing flexible man
 
 ---
 
-## Summary Table: Relationship Types
+## 📊 Summary Table: Relationship Types
 
 | Type | One-to-One | One-to-Many | Many-to-Many |
 |------|-----------|------------|-------------|
@@ -277,7 +294,7 @@ The junction table `order_items` stores these connections, allowing flexible man
 
 ---
 
-## Conclusion
+## ✅ Conclusion
 
 Understanding these SQL and relational database concepts is crucial for building scalable, maintainable applications like RocketDelivery. By using MySQL with proper primary keys, foreign keys, and relationship types, we ensure:
 - ✅ Data integrity and consistency
@@ -288,13 +305,13 @@ Understanding these SQL and relational database concepts is crucial for building
 
 ---
 
-# Analyzing the RocketDelivery Entity Relationship Diagram (ERD)
+# 📊 Analyzing the RocketDelivery Entity Relationship Diagram (ERD)
 
 The RocketDelivery restaurant management system uses a well-structured relational database with multiple relationship types connecting core business entities. This section analyzes key relationship patterns in the ERD.
 
-## Many-to-One Relationship: Orders → Customers
+## 🔗 Many-to-One Relationship: Orders → Customers
 
-### **Table Pair:** Orders and Customers
+### **📋 Table Pair:** Orders and Customers
 
 **Relationship:** Many Orders to One Customer
 
@@ -302,7 +319,7 @@ The RocketDelivery restaurant management system uses a well-structured relationa
 Customers (1) ──1:N─→ Orders (Many)
 ```
 
-### **Why This Relationship?**
+### **❓ Why This Relationship?**
 
 A customer can place multiple orders over time, but each individual order belongs to exactly one customer. This is a fundamental e-commerce relationship:
 
@@ -314,7 +331,7 @@ A customer can place multiple orders over time, but each individual order belong
 
 - **Each order** can be traced back to its single originating customer
 
-### **Practical Example:**
+### **📝 Practical Example:**
 ```sql
 -- John Doe (customer_id = 5) has multiple orders
 SELECT * FROM orders WHERE customer_id = 5;
@@ -326,7 +343,7 @@ SELECT * FROM orders WHERE customer_id = 5;
 -- 3  | ORD-089      | 5          | 2            | 2024-03-10 12:15:00  | PENDING
 ```
 
-### **Database Implementation:**
+### **🗄️ Database Implementation:**
 The `customer_id` foreign key in the `orders` table enforces this many-to-one relationship:
 ```sql
 CREATE TABLE orders (
@@ -339,7 +356,7 @@ CREATE TABLE orders (
 );
 ```
 
-### **Why It Matters:**
+### **💡 Why It Matters:**
 - Enables efficient querying of a customer's order history
 - Maintains referential integrity (can't create an order for a non-existent customer)
 - Supports analytics (total orders per customer, customer lifetime value, repeat customers)
@@ -347,7 +364,7 @@ CREATE TABLE orders (
 
 ---
 
-### **Another Many-to-One Example: Employees → Restaurants**
+### **🏢 Another Many-to-One Example: Employees → Restaurants**
 
 A similar many-to-one relationship exists between Employees and Restaurants:
 
@@ -362,9 +379,9 @@ Each restaurant can employ many staff members, but each employee works at exactl
 
 ---
 
-## Many-to-Many Relationship: Orders ↔ Products (via OrderItems)
+## ♾️ Many-to-Many Relationship: Orders ↔ Products (via OrderItems)
 
-### **Tables Involved:** Orders, Products, and OrderItems (Junction Table)
+### **📦 Tables Involved:** Orders, Products, and OrderItems (Junction Table)
 
 **Relationship:** Many Orders can contain Many Products
 
@@ -383,7 +400,7 @@ Each restaurant can employ many staff members, but each employee works at exactl
       many items     many orders
 ```
 
-### **Why This Relationship?**
+### **❓ Why This Relationship?**
 
 A single food order can contain multiple products (items), and the same product can appear in many different orders. This is a classic many-to-many relationship requiring a junction table:
 
@@ -399,7 +416,7 @@ A single food order can contain multiple products (items), and the same product 
   - Order #1045 (Sarah's order) – 1 unit
   - Order #2089 (Mike's order) – 3 units
 
-### **Practical Database Example:**
+### **📝 Practical Database Example:**
 ```sql
 -- View all items in Order #1001
 SELECT 
@@ -419,7 +436,7 @@ WHERE oi.order_id = 1001;
 -- 3  | Garlic Bread     | 1        | 5.99       | 5.99
 ```
 
-### **Database Implementation:**
+### **🗄️ Database Implementation:**
 The `order_items` junction table bridges Orders and Products:
 ```sql
 CREATE TABLE order_items (
@@ -434,7 +451,7 @@ CREATE TABLE order_items (
 );
 ```
 
-### **Why It Matters:**
+### **💡 Why It Matters:**
 - **Flexibility:** Each order can have a variable number of items
 - **Product Reusability:** Products aren't duplicated; they're referenced from a products catalog
 - **Price History:** `unit_price` in `order_items` captures the price at order time (important if prices change later)
@@ -443,7 +460,7 @@ CREATE TABLE order_items (
 
 ---
 
-### **Another Many-to-Many Example: Customers ↔ Restaurants (Implicit)**
+### **🍽️ Another Many-to-Many Example: Customers ↔ Restaurants (Implicit)**
 
 While not explicitly modeled with a junction table, customers and restaurants have an implicit many-to-many relationship through orders:
 - A customer can order from multiple restaurants
@@ -452,11 +469,11 @@ While not explicitly modeled with a junction table, customers and restaurants ha
 
 ---
 
-## One-to-Many (Inverse) Relationships
+## 📈 One-to-Many (Inverse) Relationships
 
 While the above examples show many-to-one from the child's perspective, from the parent table perspective, these create one-to-many relationships:
 
-### **Customers → Addresses (One-to-Many)**
+### **👤 Customers → Addresses (One-to-Many)**
 
 ```
 Customers (1) ──1:N─→ Addresses (Many)
@@ -476,7 +493,7 @@ SELECT * FROM addresses WHERE customer_id = 5;
 -- 3  | 789 Vacation Lane      | Tahoe         | 96150       | 5
 ```
 
-### **Restaurants → Orders (One-to-Many)**
+### **🍕 Restaurants → Orders (One-to-Many)**
 
 ```
 Restaurants (1) ──1:N─→ Orders (Many)
@@ -486,7 +503,7 @@ Restaurants (1) ──1:N─→ Orders (Many)
 
 ---
 
-## Summary: ERD Relationship Pattern in RocketDelivery
+## 📋 Summary: ERD Relationship Pattern in RocketDelivery
 
 | Relationship Type | Example | Parent Table | Child Table | Why This Pattern |
 |------------------|---------|-------------|-------------|-----------------|
@@ -498,7 +515,7 @@ Restaurants (1) ──1:N─→ Orders (Many)
 
 ---
 
-## Key Takeaways from RocketDelivery's ERD
+## 🎯 Key Takeaways from RocketDelivery's ERD
 
 1. **Many-to-One relationships** dominate transactional data (Orders, Employees, Addresses), reflecting how business operations typically organize hierarchically
 2. **Many-to-Many relationships** require junction tables to avoid data redundancy and enable flexible associations
@@ -508,9 +525,9 @@ Restaurants (1) ──1:N─→ Orders (Many)
 
 ---
 
-# Test-Driven Development (TDD) in Java: A Guide for RocketDelivery
+# 🧪 Test-Driven Development (TDD) in Java: A Guide for RocketDelivery
 
-## What is Test-Driven Development (TDD)?
+## 📚 What is Test-Driven Development (TDD)?
 
 **Test-Driven Development (TDD)** is a software development methodology where **tests are written BEFORE the actual implementation code**. Instead of writing code and then testing it afterward, TDD inverts this process:
 
@@ -521,7 +538,7 @@ Restaurants (1) ──1:N─→ Orders (Many)
 
 This approach ensures that every line of code has a corresponding test, leading to more reliable, maintainable software.
 
-### **TDD vs. Traditional Development:**
+### **⚖️ TDD vs. Traditional Development:**
 
 | Aspect | Traditional | TDD |
 |--------|-----------|-----|
@@ -534,7 +551,7 @@ This approach ensures that every line of code has a corresponding test, leading 
 
 ---
 
-## The TDD Cycle: Red-Green-Refactor
+## 🔄 The TDD Cycle: Red-Green-Refactor
 
 TDD follows a three-phase cycle repeated for each feature:
 
@@ -603,7 +620,7 @@ public class Order {
 
 ---
 
-## Why TDD Matters for RocketDelivery
+## ❤️ Why TDD Matters for RocketDelivery
 
 A food delivery platform like RocketDelivery has **zero tolerance for bugs** because they directly impact:
 - **Customer Trust:** Incorrect order totals or delivery tracking loses trust
@@ -611,7 +628,7 @@ A food delivery platform like RocketDelivery has **zero tolerance for bugs** bec
 - **Reputation:** Delivery errors and wrong food damage brand reputation
 - **Data Integrity:** Incorrect database operations can corrupt customer data
 
-### **TDD Benefits for RocketDelivery:**
+### **💪 TDD Benefits for RocketDelivery:**
 
 #### **1. Prevents Critical Business Logic Bugs**
 ```java
@@ -658,9 +675,9 @@ public void shouldPersistOrderAndNotifyRestaurant() {
 
 ---
 
-## TDD Best Practices for Java
+## ✅ TDD Best Practices for Java
 
-### **1. Test Naming Convention: Describe the Behavior**
+### **🗁️ 1. Test Naming Convention: Describe the Behavior**
 
 ```java
 // ❌ Poor - Doesn't describe intent
@@ -676,7 +693,7 @@ public void shouldCalculateOrderTotalWithDiscount() { }
 public void orderWithDiscount_appliesDiscountCorrectly() { }
 ```
 
-### **2. Follow Arrange-Act-Assert (AAA) Pattern**
+### **📋 2. Follow Arrange-Act-Assert (AAA) Pattern**
 
 Every test should have three clear sections:
 
@@ -695,7 +712,7 @@ public void shouldApply10PercentDiscountForLoyalCustomers() {
 }
 ```
 
-### **3. Write One Assertion Per Test (When Possible)**
+### **🏳️ 3. Write One Assertion Per Test (When Possible)**
 
 ```java
 // ❌ Multiple assertions - harder to isolate failures
@@ -722,7 +739,7 @@ public void newOrderHasCorrectTotal() {
 }
 ```
 
-### **4. Test Both Success and Failure Cases**
+### **✅❌ 4. Test Both Success and Failure Cases**
 
 ```java
 // Success case
@@ -746,7 +763,7 @@ public void shouldRejectOrderWithInvalidAddress() {
 }
 ```
 
-### **5. Use Meaningful Test Data**
+### **💫 5. Use Meaningful Test Data**
 
 ```java
 // ❌ Magic numbers - what do they represent?
@@ -768,7 +785,7 @@ public void calculateDeliveryFeeFor5MileDelivery() {
 }
 ```
 
-### **6. Keep Tests Fast and Isolated**
+### **⚡ 6. Keep Tests Fast and Isolated**
 
 ```java
 // ✅ Use mocks to avoid slow database calls
@@ -790,11 +807,11 @@ public void shouldApplyRestaurantDiscountRules() {
 
 ---
 
-## TDD Workflow Example: Order Status Validation
+## 🛠️ TDD Workflow Example: Order Status Validation
 
 Let's walk through a complete TDD cycle for a RocketDelivery feature:
 
-### **Feature:** Validate that orders can only transition to valid statuses
+### **🎯 Feature:** Validate that orders can only transition to valid statuses
 
 **Step 1: RED 🔴 - Write Failing Test**
 ```java
@@ -883,11 +900,11 @@ public void shouldReject_PENDING_to_COMPLETED() {
 
 ---
 
-## TDD in the Spring Boot Context (RocketDelivery's Framework)
+## 🚀 TDD in the Spring Boot Context (RocketDelivery's Framework)
 
 RocketDelivery uses Spring Boot with JPA, so TDD applies to:
 
-### **Service Layer Testing**
+### **📚 Service Layer Testing**
 ```java
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -917,7 +934,7 @@ public class OrderServiceTest {
 }
 ```
 
-### **Controller Testing**
+### **🏁 Controller Testing**
 ```java
 @WebMvcTest(OrderController.class)
 public class OrderControllerTest {
@@ -945,7 +962,7 @@ public class OrderControllerTest {
 
 ---
 
-## TDD Benefits Summary
+## 💡 TDD Benefits Summary
 
 | Benefit | How TDD Delivers It |
 |---------|------------------|
@@ -959,7 +976,7 @@ public class OrderControllerTest {
 
 ---
 
-## Getting Started with TDD in RocketDelivery
+## 🚀 Getting Started with TDD in RocketDelivery
 
 1. **Start small:** Apply TDD to new features, not legacy code
 2. **Use JUnit 5 and Mockito:** Already in RocketDelivery's pom.xml
