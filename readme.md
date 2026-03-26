@@ -14,6 +14,7 @@
 6. [API Documentation](#-api-documentation)
 7. [Author](#-author)
 8. [Additional Resources](#-additional-resources)
+9. [Module 11 Questions](#-module-11-questions)
 
 ---
 
@@ -329,13 +330,7 @@ Response includes:
 - Platform: GitHub
 - Contact: Available via repository
 
-### Project Contributors
 
-This project was developed with assistance from:
-- 🤖 **GitHub Copilot** - AI-assisted development
-- 📚 **Spring Framework Team** - Spring Boot & Spring Data
-- 🗄️ **MySQL Community** - Database platform
-- 🧪 **JUnit & Mockito Teams** - Testing frameworks
 
 ---
 
@@ -371,6 +366,14 @@ This project was developed with assistance from:
 | **Database Not Created** | Manually create: `CREATE DATABASE rdelivery;` |
 | **Lombok Annotations Not Working** | Enable annotation processing in IDE settings |
 | **Tests Failing** | Check MySQL is running, database exists, credentials are correct |
+
+---
+
+## ❓ Module 11 Questions
+
+Brief overview of questions answered in Module 11, covering project setup, architecture, and REST API implementation.
+
+For detailed answers and additional information, see [readme.modulequestions.md](readme.modulequestions.md)
 
 ---
 
