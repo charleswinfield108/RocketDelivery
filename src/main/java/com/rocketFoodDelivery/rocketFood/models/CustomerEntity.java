@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
     name = "customers",
     indexes = {
         @Index(name = "idx_user_id", columnList = "user_id"),
+        @Index(name = "idx_address_id", columnList = "address_id"),
         @Index(name = "idx_is_active", columnList = "is_active"),
         @Index(name = "idx_preferred_restaurant", columnList = "preferred_restaurant_id"),
         @Index(name = "idx_loyalty_points", columnList = "loyalty_points")
@@ -57,6 +58,21 @@ public class CustomerEntity {
     )
     @NotNull(message = "User cannot be null")
     private UserEntity user;
+
+    /**
+     * Reference to the customer's primary address.
+     * ManyToOne relationship - multiple customers can share the same address.
+     * Required field per schema (address_id, not null).
+     * Stores the customer's default/primary delivery address.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "address_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_customer_address")
+    )
+    @NotNull(message = "Address cannot be null")
+    private AddressEntity address;
 
     /**
      * Customer's phone number.

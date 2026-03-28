@@ -2,6 +2,8 @@ package com.rocketFoodDelivery.rocketFood.repository;
 
 import com.rocketFoodDelivery.rocketFood.models.OrderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -64,13 +66,15 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     List<OrderEntity> findByCustomerIdOrderByOrderDateDesc(Long customerId);
 
     /**
-     * Find all orders for a customer with a specific status.
+     * Find all orders for a customer with a specific status code.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      *
      * @param customerId the customer's ID
-     * @param status the order status to filter by
+     * @param statusCode the order status code (e.g., "PENDING", "DELIVERED")
      * @return List of matching orders
      */
-    List<OrderEntity> findByCustomerIdAndStatus(Long customerId, String status);
+    @Query("SELECT o FROM OrderEntity o WHERE o.customer.id = :customerId AND o.orderStatus.statusCode = :statusCode")
+    List<OrderEntity> findByCustomerIdAndStatus(@Param("customerId") Long customerId, @Param("statusCode") String statusCode);
 
     /**
      * Find order by ID and customer ID for authorization verification.
@@ -93,12 +97,14 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     /**
      * Count orders for a customer with a specific status.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      *
      * @param customerId the customer's ID
-     * @param status the order status
+     * @param statusCode the order status code
      * @return number of matching orders
      */
-    long countByCustomerIdAndStatus(Long customerId, String status);
+    @Query("SELECT COUNT(o) FROM OrderEntity o WHERE o.customer.id = :customerId AND o.orderStatus.statusCode = :statusCode")
+    long countByCustomerIdAndStatus(@Param("customerId") Long customerId, @Param("statusCode") String statusCode);
 
     // ==================== Restaurant Order Queries ====================
 
@@ -112,12 +118,14 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     /**
      * Find all orders for a restaurant with a specific status.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      *
      * @param restaurantId the restaurant's ID
-     * @param status the order status to filter by
+     * @param statusCode the order status code to filter by
      * @return List of matching orders ordered by orderDate descending
      */
-    List<OrderEntity> findByRestaurantIdAndStatusOrderByOrderDateDesc(Long restaurantId, String status);
+    @Query("SELECT o FROM OrderEntity o WHERE o.restaurant.id = :restaurantId AND o.orderStatus.statusCode = :statusCode ORDER BY o.orderDate DESC")
+    List<OrderEntity> findByRestaurantIdAndStatusOrderByOrderDateDesc(@Param("restaurantId") Long restaurantId, @Param("statusCode") String statusCode);
 
     /**
      * Find all orders for a restaurant, ordered by date (newest first).
@@ -148,39 +156,47 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     /**
      * Count orders for a restaurant with a specific status.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      *
      * @param restaurantId the restaurant's ID
-     * @param status the order status
+     * @param statusCode the order status code
      * @return number of matching orders
      */
-    long countByRestaurantIdAndStatus(Long restaurantId, String status);
+    @Query("SELECT COUNT(o) FROM OrderEntity o WHERE o.restaurant.id = :restaurantId AND o.orderStatus.statusCode = :statusCode")
+    long countByRestaurantIdAndStatus(@Param("restaurantId") Long restaurantId, @Param("statusCode") String statusCode);
 
     // ==================== Status Queries ====================
 
     /**
      * Find all orders with a specific status.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      * Useful for monitoring orders in particular lifecycle stages.
      *
-     * @param status the order status to search for
+     * @param statusCode the order status code to search for (e.g., "PENDING", "DELIVERED")
      * @return List of all orders with this status, ordered by date descending
      */
-    List<OrderEntity> findByStatusOrderByOrderDateDesc(String status);
+    @Query("SELECT o FROM OrderEntity o WHERE o.orderStatus.statusCode = :statusCode ORDER BY o.orderDate DESC")
+    List<OrderEntity> findByStatusOrderByOrderDateDesc(@Param("statusCode") String statusCode);
 
     /**
      * Find all orders with a specific status (unordered).
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      *
-     * @param status the order status
+     * @param statusCode the order status code
      * @return List of all orders with this status
      */
-    List<OrderEntity> findByStatus(String status);
+    @Query("SELECT o FROM OrderEntity o WHERE o.orderStatus.statusCode = :statusCode")
+    List<OrderEntity> findByStatus(@Param("statusCode") String statusCode);
 
     /**
      * Count the total number of orders with a specific status.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      *
-     * @param status the order status
+     * @param statusCode the order status code
      * @return count of orders with this status
      */
-    long countByStatus(String status);
+    @Query("SELECT COUNT(o) FROM OrderEntity o WHERE o.orderStatus.statusCode = :statusCode")
+    long countByStatus(@Param("statusCode") String statusCode);
 
     // ==================== Date Range Queries ====================
 
@@ -228,19 +244,21 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     /**
      * Find all delivered orders for a restaurant within a date range.
+     * Updated for Schema v2.0: filters by orderStatus.statusCode (FK relationship)
      * Useful for revenue reporting.
      *
      * @param restaurantId the restaurant's ID
-     * @param status typically "DELIVERED"
+     * @param statusCode the status code typically "DELIVERED"
      * @param startDate the start date (inclusive)
      * @param endDate the end date (inclusive)
      * @return List of delivered orders
      */
+    @Query("SELECT o FROM OrderEntity o WHERE o.restaurant.id = :restaurantId AND o.orderStatus.statusCode = :statusCode AND o.orderDate BETWEEN :startDate AND :endDate ORDER BY o.orderDate DESC")
     List<OrderEntity> findByRestaurantIdAndStatusAndOrderDateBetweenOrderByOrderDateDesc(
-        Long restaurantId,
-        String status,
-        LocalDateTime startDate,
-        LocalDateTime endDate
+        @Param("restaurantId") Long restaurantId,
+        @Param("statusCode") String statusCode,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
     );
 
     // ==================== Authorization & Deletion ====================

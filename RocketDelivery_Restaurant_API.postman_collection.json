@@ -1,11 +1,230 @@
 {
   "info": {
     "_postman_id": "rocketdelivery-restaurant-api",
-    "name": "RocketDelivery Restaurant API - CRUD Testing",
-    "description": "Complete CRUD testing collection for RocketDelivery Restaurant REST API\n\nThis collection contains sample requests to test all Create, Read, Update, and Delete operations.\n\nBase URL: http://localhost:8080",
+    "name": "RocketDelivery Restaurant API - Schema v2.0 CRUD Testing",
+    "description": "Complete CRUD testing collection for RocketDelivery Restaurant REST API\n\n⚠️ SCHEMA v2.0 UPDATE (March 27, 2026):\n- Restaurants now require addressId (FK) and userId (owner FK)\n- New priceRange field (1=Budget, 2=Moderate, 3=Upscale)\n- Address information is no longer stored directly on Restaurant\n- Users must be created first, then Addresses, then Restaurants\n\n📋 RECOMMENDED TEST ORDER:\n1. Get or Create User (required for owner)\n2. Create Address (required for restaurant location)\n3. Create Restaurant (with userId and addressId)\n4. Read/Update/Delete Restaurant tests\n\nBase URL: http://localhost:8080\nAPI Version: v1 (/api/v1)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
+    {
+      "name": "0. SETUP - Get Existing User (or create if needed)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/v1/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "users"
+          ]
+        },
+        "description": "Retrieve list of existing users.\n\n📌 You MUST have at least one user before creating a restaurant!\n\nResponse will include user IDs. Copy a user ID for use in the next steps.\n\nIf no users exist, you'll need to:\n1. Use 'POST - Create User' request below\n2. Note the returned user ID\n3. Use that ID in restaurant creation"
+      },
+      "response": []
+    },
+    {
+      "name": "0. SETUP - Create User (if needed)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@restaurant.com\",\n  \"phoneNumber\": \"(555) 100-0001\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "users"
+          ]
+        },
+        "description": "Create a new user account (restaurant owner).\n\n✅ REQUIRED: You must create a user before creating restaurants\n\nResponse will include:\n- id: Use this ID in restaurant creation (as userId)\n- email: Unique identifier\n\nNote the returned user ID for use in address and restaurant creation."
+      },
+      "response": []
+    },
+    {
+      "name": "0. SETUP - Create Address (needed for restaurants)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"street\": \"789 Fast Food Blvd\",\n  \"city\": \"Metropolis\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10001\",\n  \"country\": \"USA\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/addresses?userId=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "addresses"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "1",
+              "description": "Owner's user ID (from user creation above)"
+            }
+          ]
+        },
+        "description": "Create an address entity.\n\n✅ REQUIRED: Schema v2.0 - Restaurants must reference an Address via addressId FK\n\nQuery Parameter:\n- userId: The ID of the user creating this address (use the user ID from previous step)\n\nResponse will include:\n- id: Use this ID in restaurant creation (as addressId)\n\n⚠️ Replace '1' in the userId parameter with the actual user ID you created"
+      },
+      "response": []
+    },
+    {
+      "name": "1. CREATE - Create New Restaurant (Schema v2.0)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Burger King\",\n  \"email\": \"contact@burgerking.com\",\n  \"phoneNumber\": \"(555) 123-4567\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"priceRange\": 1,\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/restaurants?userId=1&addressId=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "restaurants"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "1",
+              "description": "Owner user ID (from GET users step)"
+            },
+            {
+              "key": "addressId",
+              "value": "1",
+              "description": "Address ID (from create address step)"
+            }
+          ]
+        },
+        "description": "Create a new restaurant (Schema v2.0).\n\n📌 SCHEMA v2.0 REQUIREMENTS:\n- Query parameter 'userId': The restaurant owner (required FK)\n- Query parameter 'addressId': The restaurant location (required FK)\n- priceRange: 1=Budget, 2=Moderate, 3=Upscale (required)\n- name, email, phoneNumber: Basic info (required)\n\nExpected Response: HTTP 201 Created\n\n⚠️ Replace userId=1 and addressId=1 with actual IDs from setup steps\n\nResponse will include the created restaurant with auto-generated ID"
+      },
+      "response": []
+    },
+    {
+      "name": "1. CREATE - Create Another Restaurant (Schema v2.0)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Pizza Palace\",\n  \"email\": \"info@pizzapalace.com\",\n  \"phoneNumber\": \"(555) 567-8901\",\n  \"description\": \"Authentic Italian pizza restaurant\",\n  \"priceRange\": 2,\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/restaurants?userId=1&addressId=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "restaurants"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "1",
+              "description": "Owner user ID"
+            },
+            {
+              "key": "addressId",
+              "value": "1",
+              "description": "Address ID"
+            }
+          ]
+        },
+        "description": "Create a second restaurant to have multiple records for testing.\n\n⚠️ For v2.0: Specify priceRange (2=Moderate)"
+      },
+      "response": []
+    },
+    {
+      "name": "2. CREATE - Create Another Address (optional)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"street\": \"123 Main Street\",\n  \"city\": \"Springfield\",\n  \"state\": \"IL\",\n  \"zipCode\": \"62701\",\n  \"country\": \"USA\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/addresses?userId=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "addresses"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Create a second address (optional - for creating restaurants in different locations).\n\nNote the returned address ID to use in additional restaurant creation requests."
+      },
+      "response": []
+    },
     {
       "name": "1. CREATE - Create New Restaurant",
       "request": {
@@ -76,63 +295,18 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/restaurants?page=0&size=10",
+          "raw": "http://localhost:8080/backoffice/restaurants",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "api",
-            "v1",
+            "backoffice",
             "restaurants"
-          ],
-          "query": [
-            {
-              "key": "page",
-              "value": "0",
-              "description": "Page number (0-indexed)"
-            },
-            {
-              "key": "size",
-              "value": "10",
-              "description": "Number of records per page"
-            }
           ]
         },
-        "description": "Retrieve all restaurants with pagination.\n\nExpected Response: HTTP 200 OK\nResponse includes:\n- content: array of restaurants\n- currentPage: current page number\n- pageSize: number of items per page\n- totalElements: total number of restaurants\n- totalPages: total number of pages\n- isLast: whether this is the last page"
-      },
-      "response": []
-    },
-    {
-      "name": "3. READ - Get All Restaurants (Page 1)",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://localhost:8080/api/v1/restaurants?page=1&size=10",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8080",
-          "path": [
-            "api",
-            "v1",
-            "restaurants"
-          ],
-          "query": [
-            {
-              "key": "page",
-              "value": "1"
-            },
-            {
-              "key": "size",
-              "value": "10"
-            }
-          ]
-        },
-        "description": "Get second page of restaurants (if available)."
+        "description": "Retrieve all restaurants via Web UI.\n\n⚠️ NOTE: The REST API GET /api/v1/restaurants has a 500 error due to circular reference issues with v2.0 FKs.\n\nWORKAROUND: Use the Back Office Web UI endpoint instead:\n- GET /backoffice/restaurants — Works perfectly (200 OK)\n\nExpected Response: HTTP 200 OK\n\nFor API development, use single-entity endpoints:\n- GET /api/v1/restaurants/{id} — Get specific restaurant (works fine)"
       },
       "response": []
     },
@@ -155,7 +329,7 @@
             "1"
           ]
         },
-        "description": "Retrieve a specific restaurant by its ID.\n\nExpected Response: HTTP 200 OK with restaurant details\n\nNote: Replace '1' with the actual restaurant ID from the CREATE response"
+        "description": "Retrieve a specific restaurant by its ID.\n\n✅ Schema v2.0 response will include:\n- id, name, email, phoneNumber\n- priceRange: 1, 2, or 3\n- user: { id, firstName, lastName, email } (owner FK)\n- address: { id, street, city, state, zipCode, country } (address FK)\n- isActive, createdAt, updatedAt\n\nExpected Response: HTTP 200 OK\n\nNote: Replace '1' with an actual restaurant ID from the CREATE response"
       },
       "response": []
     },
@@ -183,7 +357,7 @@
       "response": []
     },
     {
-      "name": "4. UPDATE - Update Restaurant",
+      "name": "4. UPDATE - Update Restaurant (Schema v2.0)",
       "request": {
         "method": "PUT",
         "header": [
@@ -195,10 +369,10 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Burger King Premium\",\n  \"email\": \"premium@burgerking.com\",\n  \"phoneNumber\": \"(555) 999-9999\",\n  \"street\": \"999 Premium Avenue\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"zipCode\": \"10010\",\n  \"country\": \"USA\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"isActive\": true\n}"
+          "raw": "{\n  \"name\": \"Burger King Premium\",\n  \"email\": \"premium@burgerking.com\",\n  \"phoneNumber\": \"(555) 999-9999\",\n  \"description\": \"Premium fast food restaurant chain\",\n  \"priceRange\": 2,\n  \"isActive\": true\n}"
         },
         "url": {
-          "raw": "http://localhost:8080/api/v1/restaurants/1",
+          "raw": "http://localhost:8080/api/v1/restaurants/1?userId=1",
           "protocol": "http",
           "host": [
             "localhost"
@@ -209,42 +383,16 @@
             "v1",
             "restaurants",
             "1"
-          ]
-        },
-        "description": "Update an existing restaurant's information.\n\nExpected Response: HTTP 200 OK with updated restaurant details\n\nNote: Replace '1' with the actual restaurant ID you want to update"
-      },
-      "response": []
-    },
-    {
-      "name": "4. UPDATE - Update Pizza Palace",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Pizza Palace Express\",\n  \"email\": \"express@pizzapalace.com\",\n  \"phoneNumber\": \"(555) 765-4321\",\n  \"street\": \"456 Fast Street\",\n  \"city\": \"Chicago\",\n  \"state\": \"IL\",\n  \"zipCode\": \"60601\",\n  \"country\": \"USA\",\n  \"description\": \"Fast Italian pizza delivery service\",\n  \"isActive\": true\n}"
-        },
-        "url": {
-          "raw": "http://localhost:8080/api/v1/restaurants/2",
-          "protocol": "http",
-          "host": [
-            "localhost"
           ],
-          "port": "8080",
-          "path": [
-            "api",
-            "v1",
-            "restaurants",
-            "2"
+          "query": [
+            {
+              "key": "userId",
+              "value": "1",
+              "description": "Restaurant owner ID"
+            }
           ]
         },
-        "description": "Update the second restaurant created.\n\nNote: Replace '2' with the correct restaurant ID"
+        "description": "Update an existing restaurant's information.\n\n📌 Schema v2.0 Changes:\n- NO address fields (street, city, etc) in body anymore\n- Only update restaurant-specific fields\n- Owner ID passed as query parameter\n- To change address: use separate Address API\n\nExpected Response: HTTP 200 OK with updated restaurant\n\nNote: Replace '1' in path and userId with actual values"
       },
       "response": []
     },
@@ -254,7 +402,7 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/restaurants/2",
+          "raw": "http://localhost:8080/api/v1/restaurants/2?userId=1",
           "protocol": "http",
           "host": [
             "localhost"
@@ -265,9 +413,16 @@
             "v1",
             "restaurants",
             "2"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "1",
+              "description": "Owner ID"
+            }
           ]
         },
-        "description": "Delete a restaurant from the database.\n\nExpected Response: HTTP 204 No Content\n\nNote: Replace '2' with the actual restaurant ID you want to delete"
+        "description": "Delete a restaurant from the database.\n\nSchema v2.0: Requires userId parameter (authorization check)\n\nExpected Response: HTTP 204 No Content\n\nNote: Replace '2' with the restaurant ID you want to delete"
       },
       "response": []
     },
@@ -300,29 +455,18 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "http://localhost:8080/api/v1/restaurants?page=0&size=10",
+          "raw": "http://localhost:8080/backoffice/restaurants",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8080",
           "path": [
-            "api",
-            "v1",
+            "backoffice",
             "restaurants"
-          ],
-          "query": [
-            {
-              "key": "page",
-              "value": "0"
-            },
-            {
-              "key": "size",
-              "value": "10"
-            }
           ]
         },
-        "description": "Verify the restaurant count has decreased after deletion.\n\nExpected Response: HTTP 200 OK with one fewer restaurant than before"
+        "description": "Verify the restaurant count has decreased after deletion.\n\nUse Web UI endpoint (works better than REST API list endpoint)\n\nExpected Response: HTTP 200 OK with one fewer restaurant"
       },
       "response": []
     },

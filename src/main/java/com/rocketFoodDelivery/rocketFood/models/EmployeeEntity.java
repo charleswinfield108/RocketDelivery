@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 @Table(
     name = "employees",
     indexes = {
+        @Index(name = "idx_user_id", columnList = "user_id"),
+        @Index(name = "idx_address_id", columnList = "address_id"),
         @Index(name = "idx_restaurant_id", columnList = "restaurant_id"),
         @Index(name = "idx_employment_status", columnList = "employment_status"),
         @Index(name = "idx_restaurant_status", columnList = "restaurant_id, employment_status")
@@ -44,17 +46,48 @@ public class EmployeeEntity {
     private Long id;
 
     /**
-     * Reference to the restaurant this employee works for.
-     * ManyToOne relationship - multiple employees per restaurant.
-     * Cannot be null - every employee must belong to a restaurant.
+     * Reference to the user account for this employee.
+     * OneToOne relationship - each employee is associated with exactly one user.
+     * Required field per schema (user_id, not null).
+     * Schema requirement: every employee must have a user account.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "user_id",
+        nullable = false,
+        unique = true,
+        foreignKey = @ForeignKey(name = "fk_employee_user")
+    )
+    @NotNull(message = "User cannot be null")
+    private UserEntity user;
+
+    /**
+     * Reference to the employee's address.
+     * ManyToOne relationship - multiple employees can share the same address.
+     * Required field per schema (address_id, not null).
+     * Stores employee's residential or work address.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-        name = "restaurant_id",
+        name = "address_id",
         nullable = false,
+        foreignKey = @ForeignKey(name = "fk_employee_address")
+    )
+    @NotNull(message = "Address cannot be null")
+    private AddressEntity address;
+
+    /**
+     * Reference to the restaurant this employee works for.
+     * ManyToOne relationship - multiple employees per restaurant.
+     * Optional - employee may be unassigned to restaurant.
+     * Business extension: tracks employment assignment.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(
+        name = "restaurant_id",
+        nullable = true,
         foreignKey = @ForeignKey(name = "fk_employee_restaurant")
     )
-    @NotNull(message = "Restaurant cannot be null")
     private RestaurantEntity restaurant;
 
     /**

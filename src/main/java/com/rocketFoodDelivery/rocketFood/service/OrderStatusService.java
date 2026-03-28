@@ -116,7 +116,8 @@ public class OrderStatusService {
 
         OrderStatusEntity status = new OrderStatusEntity();
         status.setStatusCode(statusCode);
-        status.setStatusName(statusName);
+        status.setName(statusName);  // Set the schema-required 'name' field
+        status.setStatusName(statusName);  // Keep for backward compatibility
         status.setDescription(description != null ? description.trim() : null);
         status.setDisplayOrder(displayOrder);
         status.setIsActive(true);

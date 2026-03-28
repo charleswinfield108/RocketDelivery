@@ -2,6 +2,21 @@
 
 This document explains how to test the Restaurant CRUD API using Postman.
 
+---
+
+## 📢 Schema v2.0 Update (March 27, 2026)
+
+This testing guide addresses the **Schema v2.0** implementation. **Important changes:**
+
+- **Restaurant Create/Update:** Now requires `address_id` (FK) and `priceRange` (1-3) fields
+- **Address Requirement:** Create addresses first, then reference address_id when creating/updating restaurants
+- **Field Changes:** No longer accepts direct address fields (street, city, etc.) in restaurant payload
+- **Backward Compatibility:** Legacy field support may be deprecated
+
+**See [SCHEMA_COMPLIANCE.md](../SCHEMA_COMPLIANCE.md) for request payload examples with new fields.**
+
+---
+
 ## Files Provided
 
 - **RocketDelivery_Restaurant_API.postman_collection.json** - Complete Postman collection with all sample requests

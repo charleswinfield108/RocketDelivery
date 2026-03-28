@@ -63,13 +63,16 @@ public class ProductEntity {
     private String description;
 
     /**
-     * Current price of the product.
+     * Cost (price) of the product.
+     * Schema requirement: cost field (int, not null).
+     * Stored as BigDecimal for precise monetary calculations.
+     * Must be positive (> 0).
      */
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    @NotNull(message = "Price cannot be null")
-    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
-    @DecimalMax(value = "99999.99", message = "Price cannot exceed 99999.99")
-    private BigDecimal price;
+    @Column(name = "cost", nullable = false, precision = 10, scale = 2)
+    @NotNull(message = "Cost cannot be null")
+    @DecimalMin(value = "0.01", message = "Cost must be greater than 0")
+    @DecimalMax(value = "99999.99", message = "Cost cannot exceed 99999.99")
+    private BigDecimal cost;
 
     /**
      * Whether this product is currently available for ordering.

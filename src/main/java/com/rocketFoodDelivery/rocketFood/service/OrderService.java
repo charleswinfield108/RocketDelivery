@@ -3,8 +3,10 @@ package com.rocketFoodDelivery.rocketFood.service;
 import com.rocketFoodDelivery.rocketFood.models.AddressEntity;
 import com.rocketFoodDelivery.rocketFood.models.CustomerEntity;
 import com.rocketFoodDelivery.rocketFood.models.OrderEntity;
+import com.rocketFoodDelivery.rocketFood.models.OrderStatusEntity;
 import com.rocketFoodDelivery.rocketFood.models.RestaurantEntity;
 import com.rocketFoodDelivery.rocketFood.repository.OrderRepository;
+import com.rocketFoodDelivery.rocketFood.repository.OrderStatusRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,17 +39,23 @@ import java.util.UUID;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderStatusRepository orderStatusRepository;
 
     /**
      * Constructor with dependency injection.
      * @param orderRepository the order data access layer
-     * @throws IllegalArgumentException if orderRepository is null
+     * @param orderStatusRepository the order status data access layer
+     * @throws IllegalArgumentException if any repository is null
      */
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, OrderStatusRepository orderStatusRepository) {
         if (orderRepository == null) {
             throw new IllegalArgumentException("OrderRepository cannot be null");
         }
+        if (orderStatusRepository == null) {
+            throw new IllegalArgumentException("OrderStatusRepository cannot be null");
+        }
         this.orderRepository = orderRepository;
+        this.orderStatusRepository = orderStatusRepository;
     }
 
     // ==================== CRUD Operations ====================
@@ -84,13 +92,17 @@ public class OrderService {
 
         validateOrderData(totalPrice, specialInstructions);
 
+        // Get PENDING status from database
+        OrderStatusEntity pendingStatus = orderStatusRepository.findByStatusCodeAndIsActive("PENDING", true)
+            .orElseThrow(() -> new IllegalArgumentException("PENDING status not found in database. Initialize reference data first."));
+
         OrderEntity order = new OrderEntity();
         order.setOrderNumber(generateUniqueOrderNumber());
         order.setCustomer(customer);
         order.setRestaurant(restaurant);
         order.setDeliveryAddress(deliveryAddress);
         order.setTotalPrice(totalPrice);
-        order.setStatus("PENDING");
+        order.setOrderStatus(pendingStatus);
         order.setSpecialInstructions(specialInstructions);
 
         return orderRepository.save(order);
@@ -201,7 +213,7 @@ public class OrderService {
         OrderEntity order = existing.get();
 
         if (!order.canBeModified()) {
-            throw new IllegalArgumentException("Cannot modify order in status: " + order.getStatus());
+            throw new IllegalArgumentException("Cannot modify order in status: " + order.getOrderStatus().getStatusCode());
         }
 
         // Only allow updating specialInstructions and totalPrice before confirmation
@@ -250,22 +262,20 @@ public class OrderService {
     // ==================== Status Management ====================
 
     /**
-     * Set order status with basic validation.
-     * Status must be one of: PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
+     * Set order status using OrderStatusEntity (schema-compliant).
+     * Status must reference a valid OrderStatusEntity (PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED)
      *
      * @param id the order ID
-     * @param newStatus the new status value
-     * @throws IllegalArgumentException if status is invalid
+     * @param orderStatus the new OrderStatusEntity
+     * @throws IllegalArgumentException if status is invalid or not found
      */
-    public OrderEntity setOrderStatus(Long id, String newStatus) {
+    public OrderEntity setOrderStatus(Long id, OrderStatusEntity orderStatus) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Order ID must be a positive number");
         }
-        if (newStatus == null || newStatus.trim().isEmpty()) {
-            throw new IllegalArgumentException("Status cannot be null or empty");
+        if (orderStatus == null) {
+            throw new IllegalArgumentException("Order status cannot be null");
         }
-
-        validateStatus(newStatus);
 
         Optional<OrderEntity> existing = orderRepository.findById(id);
         if (existing.isEmpty()) {
@@ -273,8 +283,30 @@ public class OrderService {
         }
 
         OrderEntity order = existing.get();
-        order.setStatus(newStatus);
+        order.setOrderStatus(orderStatus);
         return orderRepository.save(order);
+    }
+
+    /**
+     * Set order status by status code (convenience method).
+     * Looks up the OrderStatusEntity by statusCode.
+     *
+     * @param id the order ID
+     * @param statusCode the status code (e.g., "PENDING", "DELIVERED")
+     * @throws IllegalArgumentException if status code is invalid
+     */
+    public OrderEntity setOrderStatusByCode(Long id, String statusCode) {
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("Order ID must be a positive number");
+        }
+        if (statusCode == null || statusCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Status code cannot be null or empty");
+        }
+
+        OrderStatusEntity status = orderStatusRepository.findByStatusCodeAndIsActive(statusCode.trim(), true)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid status code: " + statusCode));
+
+        return setOrderStatus(id, status);
     }
 
     /**
@@ -301,11 +333,14 @@ public class OrderService {
 
         OrderEntity order = existing.get();
         if (!order.isPending()) {
-            throw new IllegalArgumentException("Only PENDING orders can be confirmed. Current status: " + order.getStatus());
+            throw new IllegalArgumentException("Can only confirm PENDING orders");
         }
 
-        order.setStatus("CONFIRMED");
-        order.setDeliveryEstimate(LocalDateTime.now().plusMinutes(45));
+        OrderStatusEntity confirmedStatus = orderStatusRepository.findByStatusCodeAndIsActive("CONFIRMED", true)
+            .orElseThrow(() -> new IllegalArgumentException("CONFIRMED status not found"));
+
+        order.setOrderStatus(confirmedStatus);
+        order.setEstimatedDeliveryTime(LocalDateTime.now().plusMinutes(45));
         return orderRepository.save(order);
     }
 
@@ -318,6 +353,7 @@ public class OrderService {
      * @return the updated OrderEntity
      * @throws IllegalArgumentException if not authorized or not in CONFIRMED status
      */
+    @SuppressWarnings("deprecation")
     public OrderEntity startPreparation(Long id, Long restaurantId) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Order ID must be a positive number");
@@ -348,8 +384,7 @@ public class OrderService {
      * @param restaurantId the restaurant's ID for authorization
      * @return the updated OrderEntity
      * @throws IllegalArgumentException if not authorized or not in PREPARING status
-     */
-    public OrderEntity markReady(Long id, Long restaurantId) {
+     */    @SuppressWarnings("deprecation")    public OrderEntity markReady(Long id, Long restaurantId) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Order ID must be a positive number");
         }
@@ -380,6 +415,7 @@ public class OrderService {
      * @return the updated OrderEntity
      * @throws IllegalArgumentException if not authorized or not in READY status
      */
+    @SuppressWarnings("deprecation")
     public OrderEntity markOutForDelivery(Long id, Long restaurantId) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Order ID must be a positive number");
@@ -410,6 +446,7 @@ public class OrderService {
      * @return the updated OrderEntity
      * @throws IllegalArgumentException if order not found or not out for delivery
      */
+    @SuppressWarnings("deprecation")
     public OrderEntity completeDelivery(Long id) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Order ID must be a positive number");
@@ -439,6 +476,7 @@ public class OrderService {
      * @return the updated OrderEntity
      * @throws IllegalArgumentException if not authorized or order cannot be cancelled
      */
+    @SuppressWarnings("deprecation")
     public OrderEntity cancelOrder(Long id, Long customerId) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("Order ID must be a positive number");

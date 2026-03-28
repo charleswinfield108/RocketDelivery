@@ -4,6 +4,31 @@ Simple, quick procedures for starting tools and verifying features work after im
 
 ---
 
+## 📌 Schema v2.0 Updates (March 27, 2026)
+
+**Important Changes Affecting Verification Procedures:**
+
+This guide was created for the initial schema. The project has been updated to **Schema v2.0** with these changes affecting quick start:
+
+| Entity | Change | Verification Impact |
+|--------|--------|---------------------|
+| **OrderEntity** | `status` (String) → `orderStatus` (FK to OrderStatusEntity) | Verify `order_status_id` column (FK), not `status` (String) |
+| **EmployeeEntity** | Added `user_id` (OneToOne FK) and `address_id` (ManyToOne FK) | Both fields required in DDL |
+| **RestaurantEntity** | Added `address_id` (unique FK) and `priceRange` field | Verify new columns in DDL |
+| **RestaurantEntity** | Renamed `owner_id` → `user_id` column | Updated column name in database |
+| **CustomerEntity** | Added `address_id` (ManyToOne FK, required) | Verify new FK column exists |
+| **ProductEntity** | Renamed `price` → `cost` | Verify column renamed in DDL |
+| **OrderStatusEntity** | Added `name` field with values (PENDING, CONFIRMED, etc.) | Lookup table now populated in DataSeeder |
+
+**When Verifying Tables in DBeaver:**
+- All FK columns use `_id` suffix (e.g., `order_status_id`, `user_id`, `address_id`)
+- Verify constraints: FOREIGN KEY, UNIQUE, NOT NULL per spec
+- See [SCHEMA_COMPLIANCE.md](../../SCHEMA_COMPLIANCE.md) for complete changes
+
+When running `mvn spring-boot:run`, DataSeeder will automatically populate **OrderStatusEntity** with (PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED).
+
+---
+
 ## 🚀 Startup Procedures
 
 ### 1️⃣ Start DBeaver (Database Viewer)

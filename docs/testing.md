@@ -368,6 +368,327 @@ mvn test jacoco:report
 
 ---
 
+## Schema v2.0 Testing Updates
+
+### Testing New Foreign Key Relationships
+
+With schema v2.0 alignment (OrderEntity.status String → FK, Employee user_id FK, etc.), update your test fixtures:
+
+#### OrderEntity FK Testing
+
+**OLD WAY (v1.0) - Don't Use:**
+```java
+@Test
+void testOrderCreation() {
+    OrderEntity order = new OrderEntity();
+    order.setStatus("PENDING");  // ⚠️ String assignment (deprecated)
+    assertEquals("PENDING", order.getStatus());
+}
+```
+
+**NEW WAY (v2.0) - Use This:**
+```java
+@Test
+void testOrderCreationWithForeignKey() {
+    // Arrange: Create required FK entities
+    OrderStatusEntity pendingStatus = new OrderStatusEntity();
+    pendingStatus.setStatusCode("PENDING");
+    pendingStatus.setName("Pending");
+    pendingStatus.setIsActive(true);
+    
+    CustomerEntity customer = new CustomerEntity();
+    customer.setUser(createTestUser());
+    customer.setAddress(createTestAddress());
+    
+    RestaurantEntity restaurant = new RestaurantEntity();
+    restaurant.setUser(createTestUser());
+    restaurant.setAddress(createTestAddress());
+    restaurant.setPriceRange(2);
+    
+    // Act: Create order with FK
+    OrderEntity order = new OrderEntity();
+    order.setCustomer(customer);
+    order.setRestaurant(restaurant);
+    order.setOrderStatus(pendingStatus);  // ✅ FK assignment
+    
+    // Assert
+    assertNotNull(order.getOrderStatus());
+    assertEquals("PENDING", order.getOrderStatus().getStatusCode());
+    assertEquals("PENDING", order.getStatus());  // Backward compatibility
+}
+
+@Test
+void testOrderStatusBackwardCompatibility() {
+    // Verify old code still works via compatibility methods
+    OrderStatusEntity confirmed = new OrderStatusEntity();
+    confirmed.setStatusCode("CONFIRMED");
+    
+    OrderEntity order = new OrderEntity();
+    order.setOrderStatus(confirmed);
+    
+    // Old code using getStatus() still works
+    assertEquals("CONFIRMED", order.getStatus());
+}
+```
+
+#### EmployeeEntity with User FK
+
+**Updated Test Fixture:**
+```java
+@Test
+void testEmployeeWithUserAndAddress() {
+    // Arrange: Create required FK entities
+    UserEntity user = new UserEntity();
+    user.setEmail("employee@restaurant.com");
+    user.setFirstName("John");
+    user.setLastName("Smith");
+    
+    AddressEntity address = new AddressEntity();
+    address.setStreet("123 Main St");
+    address.setCity("San Francisco");
+    address.setState("CA");
+    address.setZipCode("94102");
+    address.setCountry("USA");
+    
+    RestaurantEntity restaurant = new RestaurantEntity();
+    restaurant.setName("John's Pizza");
+    // ... set other required fields ...
+    
+    // Act: Create employee with all required FKs
+    EmployeeEntity employee = new EmployeeEntity();
+    employee.setUser(user);           // ✅ NEW: Required OneToOne FK
+    employee.setAddress(address);    // ✅ NEW: Required ManyToOne FK
+    employee.setRestaurant(restaurant); // Now optional
+    employee.setRole("CHEF");
+    
+    // Assert
+    assertNotNull(employee.getUser());
+    assertNotNull(employee.getAddress());
+    assertEquals("John", employee.getUser().getFirstName());
+    assertEquals("San Francisco", employee.getAddress().getCity());
+}
+```
+
+#### RestaurantEntity with Address FK
+
+**Updated Test Fixture:**
+```java
+@Test
+void testRestaurantWithAddressFK() {
+    // Arrange: Create required FK entities
+    UserEntity owner = new UserEntity();
+    owner.setEmail("owner@restaurant.com");
+    owner.setFirstName("Tony");
+    owner.setLastName("Soprano");
+    
+    AddressEntity address = new AddressEntity();
+    address.setStreet("456 Oak Ave");
+    address.setCity("Newark");
+    address.setState("NJ");
+    address.setZipCode("07102");
+    address.setCountry("USA");
+    
+    // Act: Create restaurant with address FK and priceRange
+    RestaurantEntity restaurant = new RestaurantEntity();
+    restaurant.setName("Tony's Pizza");
+    restaurant.setUser(owner);                    // FK (renamed from owner)
+    restaurant.setAddress(address);              // ✅ NEW: Unique FK
+    restaurant.setPriceRange(2);                // ✅ NEW: 1-3 scale
+    restaurant.setEmail("contact@tonys.com");
+    restaurant.setPhoneNumber("555-0123");
+    
+    // Sync denormalized fields with address
+    restaurant.setStreet(address.getStreet());
+    restaurant.setCity(address.getCity());
+    restaurant.setState(address.getState());
+    restaurant.setZipCode(address.getZipCode());
+    restaurant.setCountry(address.getCountry());
+    
+    // Assert
+    assertNotNull(restaurant.getAddress());
+    assertEquals(2, restaurant.getPriceRange());
+    assertEquals("Newark", restaurant.getAddress().getCity());
+    assertEquals("Newark", restaurant.getCity()); // Denormalized sync
+}
+```
+
+#### CustomerEntity with Address FK
+
+**Updated Test Fixture:**
+```java
+@Test
+void testCustomerWithAddressFK() {
+    // Arrange
+    UserEntity user = new UserEntity();
+    user.setEmail("customer@email.com");
+    user.setFirstName("Jane");
+    user.setLastName("Doe");
+    
+    AddressEntity address = new AddressEntity();
+    address.setStreet("789 Pine St");
+    address.setCity("San Francisco");
+    address.setState("CA");
+    address.setZipCode("94103");
+    address.setCountry("USA");
+    
+    // Act
+    CustomerEntity customer = new CustomerEntity();
+    customer.setUser(user);
+    customer.setAddress(address);    // ✅ NEW: Required FK
+    customer.setPhoneNumber("555-9999");
+    
+    // Assert
+    assertNotNull(customer.getAddress());
+    assertEquals("Jane", customer.getUser().getFirstName());
+    assertEquals("San Francisco", customer.getAddress().getCity());
+}
+```
+
+### Testing OrderService with OrderStatusRepository
+
+**Updated Service Test:**
+```java
+@SpringBootTest
+class OrderServiceTest {
+    
+    @Autowired
+    private OrderService orderService;
+    
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
+    
+    @Autowired
+    private OrderRepository orderRepository;
+    
+    @Autowired
+    private CustomerRepository customerRepository;
+    
+    @Autowired
+    private RestaurantRepository restaurantRepository;
+    
+    @Test
+    void testCreateOrderSetsCorrectStatus() {
+        // Arrange
+        OrderStatusEntity pendingStatus = orderStatusRepository
+            .findByStatusCodeAndIsActive("PENDING", true)
+            .orElseThrow(() -> new RuntimeException("PENDING status not initialized"));
+        
+        UserEntity customer = createTestUser("customer@test.com");
+        CustomerEntity testCustomer = createTestCustomer(customer);
+        
+        UserEntity owner = createTestUser("owner@test.com");
+        RestaurantEntity testRestaurant = createTestRestaurant(owner);
+        
+        OrderEntity order = new OrderEntity();
+        order.setCustomer(testCustomer);
+        order.setRestaurant(testRestaurant);
+        
+        // Act
+        orderService.createOrder(order);
+        
+        // Assert
+        OrderEntity savedOrder = orderRepository.findById(order.getId()).orElseThrow();
+        assertNotNull(savedOrder.getOrderStatus());
+        assertEquals("PENDING", savedOrder.getOrderStatus().getStatusCode());
+        assertEquals("PENDING", savedOrder.getStatus());  // Backward compatibility
+    }
+    
+    @Test
+    void testSetOrderStatusByCode() {
+        // Arrange
+        OrderEntity order = createTestOrder("PENDING");
+        
+        // Act: Change status using new FK-based method
+        orderService.setOrderStatusByCode(order.getId(), "CONFIRMED");
+        
+        // Assert
+        OrderEntity updated = orderRepository.findById(order.getId()).orElseThrow();
+        assertEquals("CONFIRMED", updated.getOrderStatus().getStatusCode());
+        assertEquals("CONFIRMED", updated.getStatus());
+    }
+}
+```
+
+### Testing with Mocked OrderStatusRepository
+
+**Unit Test with Mockito:**
+```java
+class OrderServiceUnitTest {
+    
+    @Mock
+    private OrderStatusRepository orderStatusRepository;
+    
+    @Mock
+    private OrderRepository orderRepository;
+    
+    private OrderService orderService;
+    
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        orderService = new OrderService(orderRepository, orderStatusRepository);
+    }
+    
+    @Test
+    void testSetOrderStatusByCodeWithMock() {
+        // Arrange
+        OrderStatusEntity confirmedStatus = new OrderStatusEntity();
+        confirmedStatus.setId(2L);
+        confirmedStatus.setStatusCode("CONFIRMED");
+        confirmedStatus.setName("Confirmed");
+        
+        when(orderStatusRepository.findByStatusCodeAndIsActive("CONFIRMED", true))
+            .thenReturn(Optional.of(confirmedStatus));
+        
+        OrderEntity order = new OrderEntity();
+        order.setId(1L);
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+        when(orderRepository.save(any(OrderEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act
+        orderService.setOrderStatusByCode(1L, "CONFIRMED");
+        
+        // Assert
+        verify(orderStatusRepository).findByStatusCodeAndIsActive("CONFIRMED", true);
+        verify(orderRepository).save(argThat(o -> "CONFIRMED".equals(o.getOrderStatus().getStatusCode())));
+    }
+}
+```
+
+### Updated Feature Testing Checklist (v2.0)
+
+For features involving FK relationships:
+
+#### Entity Implementation Checklist
+- [ ] All required FK fields present (@ManyToOne, @OneToOne)
+- [ ] FK fields are NOT nullable if schema requires it
+- [ ] @JoinColumn annotations on FK fields
+- [ ] FetchType configured (LAZY for most, EAGER for always-needed)
+- [ ] Backward compatibility methods added if renaming/replacing fields
+- [ ] Denormalized fields synchronized in service layer (if applicable)
+
+#### Service Layer Checklist
+- [ ] Repository for referenced entity is injected (e.g., OrderStatusRepository)
+- [ ] FK lookups happen before assignment (don't trust caller)
+- [ ] Proper exception handling when FK not found
+- [ ] Synchronization logic for denormalized fields
+- [ ] Backward compatibility methods marked @Deprecated
+
+#### Test Fixtures Checklist
+- [ ] Test creates required FK entities before parent
+- [ ] FK fields not null when schema requires
+- [ ] Denormalized fields synchronized in test setup
+- [ ] Both new and old API tested (FK vs deprecated String methods)
+- [ ] Backward compatibility verified
+
+#### Database Verification Checklist
+- [ ] FK columns present in table (DBeaver DESC table)
+- [ ] FK constraints visible (`SHOW CREATE TABLE`)
+- [ ] Unique constraints applied where needed
+- [ ] Indexes on FK columns for performance
+
+---
+
 ## Integration Testing
 
 ### Integration Test: Entity with Database
@@ -630,6 +951,9 @@ Use this checklist to verify each feature is complete and tested:
 - [ ] Feature works in isolation
 - [ ] Ready for next feature build
 - [ ] Documentation updated if needed
+- [ ] (v2.0+) All FK relationships properly initialized in tests
+- [ ] (v2.0+) Backward compatibility methods tested if applicable
+- [ ] (v2.0+) Denormalized fields synchronized in service layer
 
 ---
 
@@ -873,6 +1197,107 @@ git branch -D feature/users-schema
 git checkout -b feature/users-schema
 ```
 
+#### Issue: Foreign Key Constraint Violations (v2.0)
+
+**Error:** `Referential integrity constraint violation` or `FK_constraint_failed`
+
+**Solution:**
+```bash
+# Check test fixtures create FK entities first
+# WRONG:
+OrderEntity order = new OrderEntity();
+order.setOrderStatus(null);  // Missing FK
+
+# CORRECT:
+OrderStatusEntity status = orderStatusRepository.findByStatusCodeAndIsActive("PENDING", true).orElseThrow();
+OrderEntity order = new OrderEntity();
+order.setOrderStatus(status);  // FK set properly
+
+# Verify test creates all required FK entities
+# Employees need: User (OneToOne) + Address (ManyToOne)
+# Restaurants need: Address (unique FK) + priceRange
+# Customers need: Address (FK)
+# Orders need: OrderStatus (FK)
+
+# Check database constraints
+mysql -u root -p rocketfood -e "SHOW CREATE TABLE orders\G"
+# Look for: FOREIGN KEY and CONSTRAINT definitions
+```
+
+#### Issue: OrderStatusRepository Injection Fails (v2.0)
+
+**Error:** `NoSuchBeanDefinitionException: No qualifying bean of type OrderStatusRepository`
+
+**Solution:**
+```bash
+# Ensure OrderStatusRepository exists
+# File: src/main/java/com/rocketFoodDelivery/rocketFood/repository/OrderStatusRepository.java
+
+# Verify it extends JpaRepository:
+public interface OrderStatusRepository extends JpaRepository<OrderStatusEntity, Long> {
+    Optional<OrderStatusEntity> findByStatusCodeAndIsActive(String statusCode, Boolean isActive);
+}
+
+# Check OrderService injects it:
+@Service
+public class OrderService {
+    private final OrderStatusRepository orderStatusRepository;
+    
+    public OrderService(OrderRepository orderRepository, 
+                       OrderStatusRepository orderStatusRepository) {
+        this.orderRepository = orderRepository;
+        this.orderStatusRepository = orderStatusRepository;
+    }
+}
+
+# Rebuild and restart
+mvn clean compile
+mvn spring-boot:run
+```
+
+#### Issue: Deprecation Warnings on Tests
+
+**Error:** `warning: [deprecation] setStatus(String) in OrderEntity has been deprecated`
+
+**Solution:**
+```bash
+# This is expected for backward compatibility tests
+# Suppress warnings in test methods:
+@Test
+@SuppressWarnings("deprecation")
+void testDeprecatedSetStatus() {
+    order.setStatus("PENDING");  // Old API, but still works
+    assertEquals("PENDING", order.getStatus());
+}
+
+# Or suppress in test class:
+@SuppressWarnings("deprecation")
+class OrderServiceTest {
+    // All tests in this class can use deprecated methods
+}
+```
+
+#### Issue: Denormalized Fields Out of Sync
+
+**Error:** Restaurant address fields don't match FK address
+
+**Solution:**
+```bash
+# Service layer must sync denormalized and FK fields:
+RestaurantEntity restaurant = new RestaurantEntity();
+restaurant.setAddress(address);  // FK
+
+// Also sync denormalized fields
+restaurant.setStreet(address.getStreet());
+restaurant.setCity(address.getCity());
+restaurant.setState(address.getState());
+restaurant.setZipCode(address.getZipCode());
+restaurant.setCountry(address.getCountry());
+
+# In tests, verify both are set:
+assertEquals(restaurant.getAddress().getCity(), restaurant.getCity());
+```
+
 ---
 
 ## Testing Checklist Summary
@@ -901,6 +1326,10 @@ Before each feature merge to `dev`:
 ✅ No console errors or warnings
 
 ✅ Git branch clean and committed
+
+✅ (v2.0+) All FK relationships properly tested
+
+✅ (v2.0+) Backward compatibility verified
 
 ✅ Ready to merge to dev
 ```

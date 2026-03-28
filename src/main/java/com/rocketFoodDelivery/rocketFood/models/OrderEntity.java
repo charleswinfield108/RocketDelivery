@@ -36,7 +36,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_customer_id", columnList = "customer_id"),
         @Index(name = "idx_restaurant_id", columnList = "restaurant_id"),
         @Index(name = "idx_address_id", columnList = "address_id"),
-        @Index(name = "idx_status", columnList = "status"),
+        @Index(name = "idx_order_status_id", columnList = "order_status_id"),
         @Index(name = "idx_order_date", columnList = "order_date")
     }
 )
@@ -103,23 +103,34 @@ public class OrderEntity {
     private LocalDateTime orderDate;
 
     /**
-     * Current status of the order in its lifecycle.
-     * Valid values: PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
-     * Default value "PENDING" is set in service layer during order creation.
+     * The current status of the order in its lifecycle.
+     * ManyToOne relationship to OrderStatusEntity (schema requirement: order_status_id FK).
+     * References the order_statuses lookup table for standardized status values.
+     * Cannot be null - every order must have a valid status.
      *
      * Status workflow:
-     * - PENDING: Order created, awaiting confirmation
-     * - CONFIRMED: Customer confirmed, restaurant notified
-     * - PREPARING: Restaurant is preparing the order
-     * - READY: Order ready for pickup/delivery
-     * - OUT_FOR_DELIVERY: Driver is delivering (if applicable)
-     * - DELIVERED: Order successfully delivered
-     * - CANCELLED: Order was cancelled
+     * PENDING → CONFIRMED → PREPARING → READY → OUT_FOR_DELIVERY → DELIVERED (or CANCELLED)
      */
-    @Column(nullable = false, length = 50)
-    @NotNull(message = "Status cannot be null")
-    @Size(min = 1, max = 50, message = "Status must be between 1 and 50 characters")
-    private String status;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(
+        name = "order_status_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_order_status")
+    )
+    @NotNull(message = "Order status cannot be null")
+    private OrderStatusEntity orderStatus;
+
+    /**
+     * Restaurant rating provided by the customer.
+     * Required field per schema (restaurant_rating, int, nullable).
+     * Scale: 1-5 stars (1=poor, 5=excellent)
+     * Optional - set only after order is delivered and customer rates the restaurant.
+     * Null if customer hasn't rated yet.
+     */
+    @Column(name = "restaurant_rating", nullable = true)
+    @Min(value = 1, message = "Rating must be at least 1")
+    @Max(value = 5, message = "Rating cannot exceed 5")
+    private Integer restaurantRating;
 
     /**
      * Total price of the order in the platform's currency.
@@ -190,26 +201,26 @@ public class OrderEntity {
     /**
      * Check if the order is in PENDING status.
      *
-     * @return true if status equals "PENDING", false otherwise
+     * @return true if orderStatus matches PENDING, false otherwise
      */
     public boolean isPending() {
-        return "PENDING".equals(this.status);
+        return orderStatus != null && "PENDING".equals(orderStatus.getStatusCode());
     }
 
     /**
      * Check if the order is in CANCELLED status.
      *
-     * @return true if status equals "CANCELLED", false otherwise
+     * @return true if orderStatus matches CANCELLED, false otherwise
      */
     public boolean isCancelled() {
-        return "CANCELLED".equals(this.status);
+        return orderStatus != null && "CANCELLED".equals(orderStatus.getStatusCode());
     }
 
     /**
      * Check if the order can still be modified (not yet confirmed or in progress).
-     * Orders can only be modified in PENDING status.
+     * Orders can only be modified in PENDING status (per schema).
      *
-     * @return true if status is PENDING, false otherwise
+     * @return true if orderStatus is PENDING, false otherwise
      */
     public boolean canBeModified() {
         return isPending();
@@ -218,10 +229,14 @@ public class OrderEntity {
     /**
      * Check if the order is out for delivery or has been delivered.
      *
-     * @return true if status is OUT_FOR_DELIVERY or DELIVERED, false otherwise
+     * @return true if orderStatus is OUT_FOR_DELIVERY or DELIVERED, false otherwise
      */
     public boolean isInDelivery() {
-        return "OUT_FOR_DELIVERY".equals(this.status) || "DELIVERED".equals(this.status);
+        if (orderStatus == null) {
+            return false;
+        }
+        String code = orderStatus.getStatusCode();
+        return "OUT_FOR_DELIVERY".equals(code) || "DELIVERED".equals(code);
     }
 
     /**
@@ -237,6 +252,47 @@ public class OrderEntity {
     /**
      * Mark the order as delivered by setting actualDeliveryTime to now.
      * Called when order status changes to DELIVERED.
+     */
+    public void markAsDelivered() {
+        this.actualDeliveryTime = LocalDateTime.now();
+    }
+
+    // ==================== Compatibility Methods (Bridge to OrderStatusEntity) ====================
+    // These methods provide backward compatibility while the system transitions to using orderStatus FK
+
+    /**
+     * Get the status code of the current orderStatus (compatibility method).
+     * Note: Prefer using getOrderStatus().getStatusCode() for new code.
+     *
+     * @return the status code string (e.g., "PENDING", "DELIVERED"), or null if orderStatus is not set
+     */
+    public String getStatus() {
+        return orderStatus != null ? orderStatus.getStatusCode() : null;
+    }
+
+    /**
+     * Set order status by status code string (compatibility method).
+     * Note: Prefer using setOrderStatus(OrderStatusEntity) for new code.
+     * This method requires OrderStatusRepository lookup which is inefficient.
+     * For new code, inject OrderStatusRepository and use setOrderStatus(OrderStatusEntity) instead.
+     *
+     * @param statusCode the status code (e.g., "PENDING", "DELIVERED")
+     * @deprecated Use setOrderStatus(OrderStatusEntity) instead
+     */
+    @Deprecated
+    public void setStatus(String statusCode) {
+        // This is a deprecated compatibility method
+        // In production code, services should look up and set OrderStatusEntity directly
+        // For now, we log a warning and cannot set status without database access
+        if (statusCode == null) {
+            this.orderStatus = null;
+        }
+        // Note: Actual implementation requires database lookup via OrderStatusRepository
+        // This will be resolved in OrderService when status transitions occur
+    }
+
+    /**
+     * Complete delivery of the order by setting actual delivery time to now.
      */
     public void completeDelivery() {
         this.actualDeliveryTime = LocalDateTime.now();

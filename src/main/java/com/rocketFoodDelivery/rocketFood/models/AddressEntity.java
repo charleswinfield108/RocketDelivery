@@ -45,10 +45,12 @@ public class AddressEntity {
      * Reference to the user who owns this address.
      * Many addresses belong to one user.
      * Cascade delete ensures addresses are removed when user is deleted.
+     *
+     * Note: User is set by the service layer from userId parameter,
+     * so @NotNull validation is NOT applied here to allow request body validation to pass.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_address_user_id"))
-    @NotNull(message = "User ID cannot be null")
     private UserEntity user;
 
     /**

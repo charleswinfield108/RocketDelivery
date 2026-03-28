@@ -14,6 +14,5 @@ To run this application properly on your local machine, you'll need Java 17 and 
     2.  You should see a line similar to this at the end of the execution: `INFO 24016 --- [ main] c.r.rocketFood.RocketFoodApplication : Started RocketFoodApplication in 2.726 seconds (process running for 2.963)`
 
 
-    CHECKING FOR UPDATE!!!
 
 ---

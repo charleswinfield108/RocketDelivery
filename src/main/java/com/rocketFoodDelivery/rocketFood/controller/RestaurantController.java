@@ -1,7 +1,9 @@
 package com.rocketFoodDelivery.rocketFood.controller;
 
+import com.rocketFoodDelivery.rocketFood.models.AddressEntity;
 import com.rocketFoodDelivery.rocketFood.models.RestaurantEntity;
 import com.rocketFoodDelivery.rocketFood.models.UserEntity;
+import com.rocketFoodDelivery.rocketFood.service.AddressService;
 import com.rocketFoodDelivery.rocketFood.service.RestaurantService;
 import com.rocketFoodDelivery.rocketFood.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,7 @@ public class RestaurantController {
 
     private final RestaurantService restaurantService;
     private final UserService userService;
+    private final AddressService addressService;
 
     // ==================== List Endpoint ====================
 
@@ -108,29 +111,58 @@ public class RestaurantController {
      *
      * @param restaurant the restaurant entity from form binding
      * @param ownerId the owner ID from the form selection
-     * @param bindingResult validation result from @Valid
      * @param redirectAttributes for flash messages
      * @return redirect to list on success, or back to form on error
      */
     @PostMapping
     public String createRestaurant(
-        @Valid @ModelAttribute("restaurant") RestaurantEntity restaurant,
+        @ModelAttribute("restaurant") RestaurantEntity restaurant,
         @RequestParam(required = false) Long ownerId,
-        BindingResult bindingResult,
         RedirectAttributes redirectAttributes) {
 
-        if (bindingResult.hasErrors()) {
-            log.warn("Restaurant creation form has validation errors");
-            return "backoffice/restaurants/create";
-        }
-
         try {
+            // Validate required fields
+            if (restaurant.getName() == null || restaurant.getName().isBlank()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Restaurant name is required");
+                return "redirect:/backoffice/restaurants/new";
+            }
+            if (restaurant.getEmail() == null || restaurant.getEmail().isBlank()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Restaurant email is required");
+                return "redirect:/backoffice/restaurants/new";
+            }
+            if (restaurant.getPhoneNumber() == null || restaurant.getPhoneNumber().isBlank()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Restaurant phone number is required");
+                return "redirect:/backoffice/restaurants/new";
+            }
+            if (restaurant.getPriceRange() == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Price range is required");
+                return "redirect:/backoffice/restaurants/new";
+            }
+
             // Use the selected owner ID, or default to first user if not provided
             Long effectiveOwnerId = ownerId;
             if (effectiveOwnerId == null) {
                 effectiveOwnerId = getDefaultOwnerId();
             }
 
+            // Step 1: Create an address from the restaurant's address fields
+            // The restaurant form captures street, city, state, zipCode, country
+            AddressEntity newAddress = new AddressEntity();
+            newAddress.setStreet(restaurant.getStreet());
+            newAddress.setCity(restaurant.getCity());
+            newAddress.setState(restaurant.getState());
+            newAddress.setZipCode(restaurant.getZipCode());
+            newAddress.setCountry(restaurant.getCountry());
+            newAddress.setIsDefault(false);
+
+            // Create the address for the owner
+            AddressEntity createdAddress = addressService.createAddress(effectiveOwnerId, newAddress);
+            log.info("Address created for restaurant: ID {}", createdAddress.getId());
+
+            // Step 2: Link the created address to the restaurant
+            restaurant.setAddress(createdAddress);
+
+            // Step 3: Create the restaurant
             RestaurantEntity createdRestaurant = restaurantService.createRestaurant(effectiveOwnerId, restaurant);
             log.info("Restaurant created successfully: {} (ID: {})", createdRestaurant.getName(), createdRestaurant.getId());
 

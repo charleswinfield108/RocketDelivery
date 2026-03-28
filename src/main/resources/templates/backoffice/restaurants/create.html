@@ -271,6 +271,27 @@
                 <span class="form-hint">Maximum 500 characters</span>
             </div>
 
+            <!-- Price Range -->
+            <div class="form-group" th:classappend="${#fields.hasErrors('priceRange') ? 'has-error' : ''}">
+                <label for="priceRange">Price Range <span class="required">*</span></label>
+                <select id="priceRange" th:field="*{priceRange}" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <option value="">-- Select Price Range --</option>
+                    <option value="1">Budget-Friendly</option>
+                    <option value="2">Moderate</option>
+                    <option value="3">Upscale/Fine Dining</option>
+                </select>
+                <span th:if="${#fields.hasErrors('priceRange')}" th:errors="*{priceRange}" class="error-message"></span>
+                <span class="form-hint">1=Budget, 2=Moderate, 3=Upscale</span>
+            </div>
+
+            <!-- Active Status -->
+            <div class="form-group">
+                <label for="isActive">Active <span style="font-size: 12px; color: #666;">(Optional)</span></label>
+                <input type="checkbox" id="isActive" th:field="*{isActive}" style="width: auto; margin-right: 8px;">
+                <span style="color: #666; font-size: 14px;">Check to make restaurant visible</span>
+                <span class="form-hint">Defaults to active if not specified</span>
+            </div>
+
             <!-- Form Actions -->
             <div class="form-actions">
                 <a href="/backoffice/restaurants" class="btn btn-secondary">Cancel</a>

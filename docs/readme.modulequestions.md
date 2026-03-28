@@ -286,7 +286,30 @@ Understanding these SQL and relational database concepts is crucial for building
 
 # 📊 Analyzing the RocketDelivery Entity Relationship Diagram (ERD)
 
-The RocketDelivery restaurant management system uses a well-structured relational database with multiple relationship types connecting core business entities. This section analyzes key relationship patterns in the ERD.
+## ⚠️ Schema v2.0 Update (March 27, 2026)
+
+This section was created for the initial schema. **RocketDelivery has been updated to Schema v2.0** with significant relationship changes:
+
+### Key v2.0 Changes:
+| From → To | Impact | Explanation |
+|-----------|--------|-------------|
+| **Orders.status (String) → Orders.orderStatus (FK)** | NEW RELATIONSHIP | Orders now reference OrderStatusEntity lookup table instead of String ENUM |
+| **Employees.user_id (NEW FK)** | NEW RELATIONSHIP | Employees now have one-to-one relationship with Users |
+| **Employees.address_id (NEW FK)** | NEW RELATIONSHIP | Employees have many-to-one relationship with Addresses |
+| **Restaurants.address_id (NEW FK)** | NEW RELATIONSHIP | Restaurants have many-to-one relationship with Addresses (previously address was denormalized) |
+| **Restaurants.owner_id → user_id** | COLUMN RENAMED | Changed to align with Users relationship naming |
+| **Customers.address_id (NEW FK)** | NEW RELATIONSHIP | Customers have many-to-one relationship with Addresses |
+| **Products.price → cost** | FIELD RENAMED | Changed to distinguish from line item pricing |
+
+### v2.0 Relationship Changes:
+- **Orders:** Now use FK relationship for status (Orders M:1 OrderStatus) instead of direct String enum
+- **Employees:** Now bridge Users ↔ Restaurants with explicit primary user association
+- **Addresses:** Now central hub with M:1 relationships from Restaurants, Employees, Customers vs. denormalized data
+- **OrderStatusEntity:** Now populated reference table with PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
+
+**See [SCHEMA_COMPLIANCE.md](../../SCHEMA_COMPLIANCE.md) for complete migration details and SQL changes.**
+
+---
 
 ## 🔗 Many-to-One Relationship: Orders → Customers
 

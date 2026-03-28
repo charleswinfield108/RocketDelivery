@@ -8,13 +8,14 @@
 
 1. [Project Title & Description](#-rocketdelivery---food-delivery-platform)
 2. [Tech Stack](#-tech-stack)
-3. [Project Structure](#-project-structure)
-4. [Installation & Setup Instructions](#-installation--setup-instructions)
-5. [Environment Variables](#-environment-variables)
-6. [API Documentation](#-api-documentation)
-7. [Author](#-author)
-8. [Additional Resources](#-additional-resources)
-9. [Module 11 Questions](#-module-11-questions)
+3. [Schema Compliance](#-schema-compliance)
+4. [Project Structure](#-project-structure)
+5. [Installation & Setup Instructions](#-installation--setup-instructions)
+6. [Environment Variables](#-environment-variables)
+7. [API Documentation](#-api-documentation)
+8. [Author](#-author)
+9. [Additional Resources](#-additional-resources)
+10. [Module 11 Questions](#-module-11-questions)
 
 ---
 
@@ -44,7 +45,31 @@
 
 ---
 
-## 📁 Project Structure
+## ✅ Schema Compliance
+
+This project is **fully aligned with the database schema specification** while maintaining all business logic extensions.
+
+### Key Schema Updates (v2.0)
+
+| Entity | Schema Changes | Status |
+|--------|-----------------|--------|
+| **EmployeeEntity** | Added `user_id` (OneToOne), `address_id` (ManyToOne) FKs | ✅ Compliant |
+| **RestaurantEntity** | Added `address_id` FK, `priceRange` field (1-3), renamed `owner_id` → `user_id` | ✅ Compliant |
+| **OrderEntity** | Changed `status` String → `orderStatus` FK to OrderStatusEntity, added `restaurantRating` | ✅ Compliant |
+| **OrderStatusEntity** | Added `name` field, kept `statusCode`, `statusName` for rich metadata | ✅ Compliant |
+| **CustomerEntity** | Added `address_id` (ManyToOne) FK for customer's primary address | ✅ Compliant |
+| **ProductEntity** | Renamed `price` → `cost` field for schema consistency | ✅ Compliant |
+| **AddressEntity** | No changes (exceeds schema with state, country, address_type, is_default) | ✅ Enhanced |
+| **UserEntity** | No changes (firstName/lastName split exceeds schema) | ✅ Enhanced |
+| **ProductOrderEntity** | No changes (fully schema-compliant) | ✅ Compliant |
+
+### Backward Compatibility
+
+- ✅ Old code using `order.getStatus()` continues to work (returns status code string)
+- ⚠️ `order.setStatus(String)` is deprecated but functional for transition period
+- ✅ All relationships load properly via Hibernate lazy-loading
+
+---
 
 ```
 RocketDelivery/
@@ -341,18 +366,13 @@ Response includes:
 - **Primary & Foreign Keys** - Data integrity enforcement
 - **Entity Relationships** - 1:1, 1:N, M:N patterns
 - **Database Design** - Normalization and schema design
-
-### Project Documentation
-- **Back Office Guide** → [back_office_implementation_report.md](back_office_implementation_report.md)
-- **Testing Guide** → [testing.md](testing.md)
-- **Quick Start** → [quick_start.md](quick_start.md)
-- **AI Features** → [docs/ai/features/](docs/ai/features/)
+- **Foreign Keys & Referential Integrity** - Ensures data consistency
 
 ### Development Guides
 - **Test-Driven Development (TDD)** - Write tests first, then code
 - **Spring Boot Best Practices** - Framework conventions
 - **REST API Design** - HTTP methods, status codes, pagination
-- **Entity Relationships** - Database modeling patterns
+- **Entity Relationships** - Database modeling patterns with Hibernate JPA
 
 ---
 

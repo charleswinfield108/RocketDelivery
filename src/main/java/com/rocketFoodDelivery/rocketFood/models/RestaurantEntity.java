@@ -21,8 +21,10 @@ import java.time.LocalDateTime;
     indexes = {
         @Index(name = "idx_name", columnList = "name"),
         @Index(name = "idx_is_active", columnList = "is_active"),
-        @Index(name = "idx_owner_id", columnList = "owner_id"),
-        @Index(name = "idx_owner_active", columnList = "owner_id, is_active")
+        @Index(name = "idx_user_id", columnList = "user_id"),
+        @Index(name = "idx_address_id", columnList = "address_id"),
+        @Index(name = "idx_price_range", columnList = "price_range"),
+        @Index(name = "idx_user_active", columnList = "user_id, is_active")
     }
 )
 @Data
@@ -49,11 +51,31 @@ public class RestaurantEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-        name = "owner_id",
+        name = "user_id",
         nullable = false,
-        foreignKey = @ForeignKey(name = "fk_restaurant_owner")
+        foreignKey = @ForeignKey(name = "fk_restaurant_user")
     )
     private UserEntity owner;
+
+    /**
+     * Reference to the restaurant's address.
+     * ManyToOne relationship with unique constraint - each restaurant has one primary address.
+     * Required field per schema (address_id, not null, unique).
+     * Stores the restaurant's physical location.
+     * 
+     * Note: Address is set by the service layer from addressId in request body,
+     * so @NotNull validation is NOT applied here to allow request body validation to pass.
+     * @JsonIgnore: Prevents lazy loading issues during JSON serialization.
+     */
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "address_id",
+        nullable = false,
+        unique = true,
+        foreignKey = @ForeignKey(name = "fk_restaurant_address")
+    )
+    private AddressEntity address;
 
     /**
      * Restaurant name.
@@ -119,6 +141,19 @@ public class RestaurantEntity {
     @Column(name = "email", length = 255)
     @Email(message = "Email must be valid")
     private String email;
+
+    /**
+     * Price range classification of the restaurant.
+     * Required field per schema (price_range, int, not null, default=1).
+     * Scale: 1 (budget-friendly) to 3 (upscale/fine dining)
+     * Helps customers filter restaurants by price expectations.
+     * Default: 1 (budget-friendly)
+     */
+    @Column(name = "price_range", nullable = false)
+    @NotNull(message = "Price range cannot be null")
+    @Min(value = 1, message = "Price range must be at least 1")
+    @Max(value = 3, message = "Price range cannot exceed 3")
+    private Integer priceRange = 1;
 
     /**
      * Whether the restaurant is currently active.

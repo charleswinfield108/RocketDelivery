@@ -7,6 +7,26 @@
 
 ---
 
+## 📋 Schema v2.0 Updates (March 27, 2026)
+
+This report was created before schema v2.0 alignment. **Important changes affecting this report:**
+
+| Change | Impact | Notes |
+|--------|--------|-------|
+| **Column renamed** | `owner_id` → `user_id` | Repository methods now use userId naming |
+| **New FK field** | `address_id` (unique, required) | Each restaurant must reference an Address entity |
+| **New field** | `priceRange` (int 1-3) | Restaurant pricing tier (budget, moderate, upscale) |
+| **Service updates** | Methods now handle address FK | Address FK required when creating/updating restaurants |
+
+**Impact on Back Office:**
+- Forms now include address selection (dropdown/lookup)
+- priceRange added as form field (radio buttons or dropdown: 1, 2, 3)
+- Database migration required before using v2.0 code
+
+See [SCHEMA_COMPLIANCE.md](../../SCHEMA_COMPLIANCE.md) for complete migration details.
+
+---
+
 ## ✅ Checklist Item 1: Credentials Configuration
 
 ### Requirement

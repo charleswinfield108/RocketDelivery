@@ -19,6 +19,7 @@ public class DataSeeder {
         private final AddressRepository addressRepository;
         private final RestaurantRepository restaurantRepository;
         private final OrderRepository orderRepository;
+        private final OrderStatusRepository orderStatusRepository;
         private final OrderStatusService orderStatusService;
 
         @Autowired
@@ -27,12 +28,14 @@ public class DataSeeder {
                         AddressRepository addressRepository,
                         RestaurantRepository restaurantRepository,
                         OrderRepository orderRepository,
+                        OrderStatusRepository orderStatusRepository,
                         OrderStatusService orderStatusService) {
                 this.userRepository = userRepository;
                 this.customerRepository = customerRepository;
                 this.addressRepository = addressRepository;
                 this.restaurantRepository = restaurantRepository;
                 this.orderRepository = orderRepository;
+                this.orderStatusRepository = orderStatusRepository;
                 this.orderStatusService = orderStatusService;
         }
 
@@ -80,6 +83,7 @@ public class DataSeeder {
                 // Seed Customers
                 CustomerEntity customer = new CustomerEntity();
                 customer.setUser(customerUser);
+                customer.setAddress(customerAddress);  // NEW: Schema-required address FK
                 customer.setPhoneNumber("1234567890");
                 customer.setLoyaltyPoints(0);
                 customer.setIsActive(true);
@@ -89,6 +93,8 @@ public class DataSeeder {
                 RestaurantEntity restaurant = new RestaurantEntity();
                 restaurant.setName("Paradise Pizza");
                 restaurant.setOwner(restaurantOwner);
+                restaurant.setAddress(customerAddress);  // NEW: Schema-required address FK
+                restaurant.setPriceRange(2);  // NEW: Schema-required price_range field (1-3)
                 restaurant.setPhoneNumber("5551234567");
                 restaurant.setEmail("contact@paradisepizza.com");
                 restaurant.setIsActive(true);
@@ -101,7 +107,12 @@ public class DataSeeder {
                 order1.setRestaurant(restaurant);
                 order1.setDeliveryAddress(customerAddress);
                 order1.setTotalPrice(new BigDecimal("25.99"));
-                order1.setStatus("PENDING");
+                
+                // NEW: Set orderStatus FK instead of status String
+                OrderStatusEntity pendingStatus = orderStatusRepository.findByStatusCodeAndIsActive("PENDING", true)
+                    .orElseThrow(() -> new RuntimeException("PENDING status not initialized"));
+                order1.setOrderStatus(pendingStatus);
+                
                 order1.setSpecialInstructions("No extra cheese on the pizza");
                 orderRepository.save(order1);
 
@@ -111,7 +122,12 @@ public class DataSeeder {
                 order2.setRestaurant(restaurant);
                 order2.setDeliveryAddress(customerAddress);
                 order2.setTotalPrice(new BigDecimal("18.50"));
-                order2.setStatus("CONFIRMED");
+                
+                // NEW: Set orderStatus FK instead of status String
+                OrderStatusEntity confirmedStatus = orderStatusRepository.findByStatusCodeAndIsActive("CONFIRMED", true)
+                    .orElseThrow(() -> new RuntimeException("CONFIRMED status not initialized"));
+                order2.setOrderStatus(confirmedStatus);
+                
                 order2.setSpecialInstructions("Extra sauce please");
                 orderRepository.save(order2);
         }

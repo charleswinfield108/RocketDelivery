@@ -6,6 +6,25 @@
 
 ---
 
+## 📋 Schema v2.0 Updates (March 27, 2026)
+
+This report was created before schema v2.0 alignment. **Important changes affecting Back Office forms:**
+
+| Change | Impact | Form Update |
+|--------|--------|-------------|
+| **New FK field** | Restaurants require `address_id` | Add address dropdown/selection field |
+| **New field** | Restaurants have `priceRange` (1-3) | Add price range selector (radio/dropdown) |
+| **Column renamed** | `owner_id` → `user_id` | Internal change, no UI impact |
+
+**Form Updates Needed:**
+- Create/Edit forms should include "Address" field (dropdown of available addresses)
+- Create/Edit forms should include "Price Range" field (select: 1=Budget, 2=Moderate, 3=Upscale)
+- Table display could show price_range as icon or badge
+
+See [SCHEMA_COMPLIANCE.md](../../SCHEMA_COMPLIANCE.md) for complete migration details.
+
+---
+
 ## Executive Summary
 
 All Back Office Frontend components have been successfully implemented, tested, and verified. The Thymeleaf-based web interface provides full CRUD (Create, Read, Update, Delete) functionality for restaurant management with proper validation, error handling, and database persistence.

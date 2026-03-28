@@ -4,6 +4,27 @@ This document is the **main AI specification** for RocketDelivery. It explains t
 
 ---
 
+## 📢 Schema v2.0 Update (March 27, 2026)
+
+**IMPORTANT:** This project has been upgraded to **Schema v2.0** with significant database changes:
+
+### Core Relationship Changes:
+- **OrderEntity.status:** Changed from String field to `orderStatus` foreign key referencing OrderStatusEntity
+- **EmployeeEntity:** Added `user_id` (OneToOne FK) and `address_id` (ManyToOne FK) relationships
+- **RestaurantEntity:** Added `address_id` (ManyToOne FK, unique) and `priceRange` field; renamed `owner_id` → `user_id`
+- **CustomerEntity:** Added `address_id` (ManyToOne FK) requirement
+- **ProductEntity:** Renamed `price` → `cost` field
+- **OrderStatusEntity:** Now populated reference table with status values (PENDING, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, DELIVERED, CANCELLED)
+
+### Database Integrity Enhancements:
+- All relationships now properly use Foreign Key constraints
+- Status values controlled through OrderStatusEntity lookup table
+- Address normalization with FK relationships vs. denormalized fields
+
+**All implementations below reflect Schema v2.0.** See [SCHEMA_COMPLIANCE.md](../SCHEMA_COMPLIANCE.md) for migration details and SQL scripts.
+
+---
+
 ## Project Identity
 
 - **Project Name:** Rocket Food Delivery

@@ -55,6 +55,18 @@ public class OrderStatusEntity {
     private Long id;
 
     /**
+     * Primary user-friendly name for the order status (schema requirement: name).
+     * Shown to customers in order tracking and UI dropdowns.
+     * Examples: "Pending", "Confirmed", "Preparing", "Ready", "Out for Delivery", "Delivered", "Cancelled"
+     * Must be unique and descriptive.
+     * Immutable reference data.
+     */
+    @Column(name = "name", unique = true, nullable = false, length = 100)
+    @NotNull(message = "Status name cannot be null")
+    @Size(min = 1, max = 100, message = "Status name must be between 1 and 100 characters")
+    private String name;
+
+    /**
      * Machine-readable status code identifier.
      * Used internally by services for status checks and validations.
      * Examples: "PENDING", "CONFIRMED", "PREPARING", "READY", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"
@@ -67,10 +79,12 @@ public class OrderStatusEntity {
     private String statusCode;
 
     /**
-     * User-friendly display name for the status.
+     * User-friendly display name for the status (kept for backward compatibility).
+     * Mirrors the primary 'name' field for seamless integration.
      * Shown to customers in order tracking and UI dropdowns.
      * Examples: "Pending", "Confirmed", "Preparing", "Ready", "Out for Delivery", "Delivered", "Cancelled"
      * Must be unique; allows customers to identify order state.
+     * Note: 'name' field is the schema-required primary field.
      * Immutable reference data.
      */
     @Column(name = "status_name", unique = true, nullable = false, length = 100)
